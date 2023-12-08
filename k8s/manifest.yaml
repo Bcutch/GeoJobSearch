@@ -20,7 +20,7 @@ spec:
           service:
             name: react-service
             port: 
-              number: 4000
+              number: 3000
       - path: /api
         pathType: Prefix
         backend:
