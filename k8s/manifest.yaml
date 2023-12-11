@@ -86,7 +86,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5zb2NzLnVvZ3VlbHBoLmNhIjp7InVzZXJuYW1lIjoiYW1lcmNoMDQiLCJwYXNzd29yZCI6ImdscGF0LUhQZHh5SzNmdEFrSm5NY05CUjEtIiwiYXV0aCI6IllXMWxjbU5vTURRNloyeHdZWFF0U0ZCa2VIbExNMlowUVd0S2JrMWpUa0pTTVMwPSJ9fX0=
+  .dockerconfigjson: ew0KICAgICJhdXRocyI6IHsNCiAgICAgICAicmVnaXN0cnkuc29jcy51b2d1ZWxwaC5jYSI6IHsNCiAgICAgICAgICAgICAgICAgInVzZXJuYW1lIjogImFtZXJjaDA0IiwNCiAgICAgICAgICAgICAgICAgInBhc3N3b3JkIjogImdscGF0LTh3MzdpbmtaTGhhNjNXYWNSR3pYIg0KICAgICAgICAgICB9DQogICB9DQp9
 kind: Secret
 metadata:
   name: regcred
@@ -112,23 +112,3 @@ spec:
     - http01:
         ingress:
           class: nginx
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: letsencrypt-staging
-  namespace: gitlab-agent-local
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: amerch04@uoguelph.ca
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
-    solvers:
-    - http01:
-        ingress:
-            class: nginx

@@ -3,7 +3,7 @@ layout: post
 category: Deployment
 ---
 
-In our journey, we've successfully containerized our application, deployed it locally using docker and minikube, and hosted it on a Kubernetes cluster. This next blog post delves into continuous deployment – the process that ensures any changes made to our repository or code are automatically reflected and deployed to the hosted template application. The key to achieving this lies in using a Gitlab Agent. While other tools like Github Actions, Jenkins, Circle CI, etc., offer similar functionalities, we'll focus on the Gitlab Agent in this guide. Let's explore how we can seamlessly integrate continuous deployment into our application workflow.
+So far in our journey, we've successfully containerized our application, deployed it locally using docker and minikube, and hosted it on a Kubernetes cluster. This next blog post delves into continuous deployment – the process that ensures any changes made to our repository or code are automatically reflected and deployed to the hosted template application. The key to achieving this lies in using a Gitlab Agent. While other tools like Github Actions, Jenkins, Circle CI, etc., offer similar functionalities, we'll focus on the Gitlab Agent in this guide. Let's explore how we can seamlessly integrate continuous deployment into our application workflow.
 
 ---
 <h1 align="center">Definitions</h1>

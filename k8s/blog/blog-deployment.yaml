@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: blog
-        image: registry.socs.uoguelph.ca/amerch04/springtemplate/blog:v0.0.6
+        image: registry.socs.uoguelph.ca/amerch04/springtemplate/blog:v0.0.7
         imagePullPolicy: Always
         ports:
         - containerPort: 4000

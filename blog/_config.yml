@@ -3,7 +3,7 @@ author: Alif Merchant
 email: amerch04@uguelph.ca
 baseurl: "/blogs"
 description: >
-  A guide on setting up your webserver with docker, k8s and continuous deployment with GitLab.
+  A guide on setting up the template webserver with docker, k8s and continuous deployment with GitLab.
 
 theme: no-style-please
 

@@ -3,7 +3,7 @@ layout: post
 category: K8s
 ---
 
-In the previous post, we set up a local application using Minikube, leveraging the features of Kubernetes (K8s). In this post, our focus shifts to the deployment of the Spring template on this host using Kubernetes. The key elements we'll explore include creating deployments, services, and ingress, all important components for deploying our application. Continuous integration and deployment will be discussed in the following posts.
+In the previous post, we set up a local application using Minikube, leveraging the features of Kubernetes (K8s). In this post, our focus shifts to the deployment of the Spring template on this host using Kubernetes. The key elements we'll explore include creating deployments, services, and ingress, all important components for deploying our application. Continuous integration and deployment will be discussed in the following post.
 
 ---
 <h1 align="center">Overview</h1>
@@ -20,7 +20,7 @@ All Kubernetes manifest files are located in the ```/k8s/``` folder and create o
 <h1 align="center">Secret</h1>
 ---
 
-Similar to the previous post, we're retrieving images from a remote repository to run in the pods. However, this time, the repository is private, which requires a token for image pulling. The Gitlab Container Registry serves as our image storage, and conveniently, we can create tokens and use them as secrets for pulling our images.
+Similar to the previous post, we're retrieving images from a remote repository to run in the pods. However, this time, the repository is private, which requires a token for image pulling. The Gitlab Container Registry serves as our image storage, and conveniently, it allows us create tokens and use them as secrets for pulling our images.
 
 ### Pushing Images to Gitlab Container Registry (Full guide can be found [here](https://docs.gitlab.com/ee/user/packages/container_registry/))
 

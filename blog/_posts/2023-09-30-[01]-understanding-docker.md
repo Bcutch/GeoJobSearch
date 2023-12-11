@@ -41,7 +41,7 @@ In the next post, we will be going through the specifics of each container, guid
 <h1 align="center">Understanding Dockerfiles</h1>
 ---
 
-Earlier in this post we went through what a Docker Image is and how it forms the basis for containers. Now, let’s take a deeper look into creating your own Docker image using a Dockerfile. A Dockerfile is a set of instructions that defines the environment for your application.
+Earlier in this post we went through what a Docker Image is and how it forms the basis for containers. Now, let’s take a deeper look into creating our own Docker image using a Dockerfile. A Dockerfile is a set of instructions that defines the environment for your application.
 
 ### Prerequisites:
 

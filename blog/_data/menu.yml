@@ -6,6 +6,14 @@ entries:
       show_more_text: See archive...
       show_more_url: archive.html
 
-  - title: extra material
+  - title: extra material + quick links
     entries:
-      - title: designing distributed systems - Brendan Burns
+      - title: Designing Distributed Systems - Brendan Burns
+      - title: Docker
+        url: https://www.docker.com/
+      - title: Kubernetes
+        url: https://kubernetes.io/
+      - title: Gitlab CI/CD
+        url: https://docs.gitlab.com/ee/ci/
+      - title: Cert-manager
+        url: https://cert-manager.io/docs/
