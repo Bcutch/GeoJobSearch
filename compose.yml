@@ -1,8 +1,9 @@
+# List of Services
 services:
   spring:
-    build: ./spring
+    build: ./spring   # Look for Dockerfile in this path
     ports:
-      - "8080:8080"
+      - "8080:8080"   # Expose port 8080
     environment:
       # These are used in apllication.property to setup DB connection
       - DB_ADDRESS=jdbc:mysql://mysql:3306
@@ -10,33 +11,34 @@ services:
       - DB_USER=root
       - DB_PASSWORD=pwd
     networks:
-      - spring-mysql
-      - spring-react
+      - spring-mysql    # Allow the spring app to discover the mysql app
+      - spring-react    # Allow the spring app to talk to the react app
 
   mysql:
-    build: ./mysql
+    build: ./mysql    # Look for Dockerfile in this path
     environment:
       # Mysql docker image env vars
       - MYSQL_ROOT_PASSWORD=pwd
       - MYSQL_DATABASE=template_db
     networks:
-      - spring-mysql
+      - spring-mysql    # Allow the spring app to talk to the spring app
     
   react:
-    build: ./react
+    build: ./react    # Look for Dockerfile in this path
     ports:
-      - "3000:3000"
+      - "3000:3000"   # Expose port 3000
     environment:
       # Tell the react app that our spring server is running here
       - BACKEND_PROXY=http://spring:8080
     networks:
-      - spring-react
+      - spring-react    # Allow the spring app to discover the spring app
 
   blog:
     build: ./blog
     ports:
       - "4000:4000"
-    
-networks:
+
+# List of Networks
+networks:               
   spring-mysql:
   spring-react:

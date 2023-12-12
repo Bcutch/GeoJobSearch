@@ -27,7 +27,7 @@ build-mysql:
 build-react:
   stage: build
   script:
-    - /kaniko/executor --context "./react" --destination "${CI_REGISTRY_IMAGE}/react:v0.0.0"
+    - /kaniko/executor --context "./react" --destination "${CI_REGISTRY_IMAGE}/react:v0.0.2"
   rules:
     - if: $CI_COMMIT_BRANCH == "deploy"
       changes:
