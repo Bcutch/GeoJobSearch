@@ -51,5 +51,8 @@ public class NotesServiceImpl implements NotesService {
         return notesDao.findAll();
     }
 
-    
+    @Override
+    public Integer count() {
+        return notesDao.getCount();
+    }
 }

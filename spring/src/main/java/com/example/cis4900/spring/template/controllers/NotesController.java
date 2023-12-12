@@ -48,4 +48,9 @@ public class NotesController {
     private @ResponseBody Iterable<Note> allNotes() {
         return notesService.allNotes();
     }
+
+    @GetMapping("/count")
+    private @ResponseBody Integer count() {
+        return notesService.count();
+    }
 }

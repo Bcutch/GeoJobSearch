@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: spring
-        image: registry.socs.uoguelph.ca/amerch04/springtemplate/spring:v0.0.0
+        image: registry.socs.uoguelph.ca/amerch04/springtemplate/spring:v0.0.1
         imagePullPolicy: Always
         env:
           - name: DB_ADDRESS

@@ -13,4 +13,6 @@ public interface NotesService {
     public String deleteNote(Integer id);
 
     public Iterable<Note> allNotes();
+
+    public Integer count();
 }

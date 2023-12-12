@@ -9,7 +9,7 @@ stages:
 build-spring:
   stage: build
   script:
-    - /kaniko/executor --context "./spring" --destination "${CI_REGISTRY_IMAGE}/spring:v0.0.0"
+    - /kaniko/executor --context "./spring" --destination "${CI_REGISTRY_IMAGE}/spring:v0.0.1"
   rules:
     - if: $CI_COMMIT_BRANCH == "deploy"
       changes:
@@ -27,7 +27,7 @@ build-mysql:
 build-react:
   stage: build
   script:
-    - /kaniko/executor --context "./react" --destination "${CI_REGISTRY_IMAGE}/react:v0.0.2"
+    - /kaniko/executor --context "./react" --destination "${CI_REGISTRY_IMAGE}/react:v0.0.3"
   rules:
     - if: $CI_COMMIT_BRANCH == "deploy"
       changes:

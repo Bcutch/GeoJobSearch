@@ -10,14 +10,17 @@ import GlobalNavBar from '../../components/GlobalNavBar';
 
 const HomePage = () => {
     const [notes, setNotes] = useState([]);
+    const [count, setCount] = useState(0);
     const [newNote, setNewNote] = useState('');
     const [showEdit, setShowEdit] = useState(false);
     const [noteToEdit, setNoteToEdit] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [loadingCount, setLoadingCount] = useState(false);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
+        fetchCount();
         fetchAllNotes();
     }, [])
 
@@ -43,6 +46,20 @@ const HomePage = () => {
             });
     }
 
+    const fetchCount = () => {
+        setLoadingCount(true);
+        fetch('/api/notes/count')
+            .then(status)
+            .then(res => res.json())
+            .then(data => {
+                setCount(data);
+                setLoadingCount(false);
+            }).catch(error => {
+                setErrorMessage(error.message);
+                setError(true);
+            });
+    }
+
     const addNewNote = () => {
         fetch('/api/notes/add', {
             method: 'POST',
@@ -58,6 +75,7 @@ const HomePage = () => {
             console.log(res);
             setNewNote('');
             fetchAllNotes();
+            fetchCount();
         }).catch(error => {
             setErrorMessage(error.message);
             setError(true);
@@ -72,6 +90,7 @@ const HomePage = () => {
         .then(res => {
             console.log(res);
             fetchAllNotes();
+            fetchCount();
         }).catch(error => {
             setErrorMessage(error.message);
             setError(true);
@@ -116,10 +135,12 @@ const HomePage = () => {
                 }
                 <NewNoteForm value={newNote} onChange={setNewNote} onSubmit={addNewNote} />
                 <br />
-                {loading ? 
+                {loading || loadingCount ? 
                     <LoadingSpinner />
                     : 
-                    <NotesList list={notes} onEdit={triggerEditModal} onDelete={deleteNote}/>
+                    <div>
+                        <NotesList list={notes} count={count} onEdit={triggerEditModal} onDelete={deleteNote}/>
+                    </div>
                 }
             </Container>
             <EditNoteModal note={noteToEdit} show={showEdit} onClose={editClose} onSave={editNote} />

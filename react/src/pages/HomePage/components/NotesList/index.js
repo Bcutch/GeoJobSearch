@@ -7,7 +7,7 @@ import Button from 'react-bootstrap/Button';
 const NotesList = (props) => {
     return <div>
         <Row>
-            <h2>Note List</h2>
+            <h2>Note List ({props.count})</h2>
         </Row>
         {props.list.length === 0 ? 
             <Alert variant='info'>List is empty</Alert>
