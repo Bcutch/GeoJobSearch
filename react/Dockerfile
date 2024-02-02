@@ -10,6 +10,9 @@ COPY package-lock.json package-lock.json
 # Run `npm ci` to install project dependencies
 RUN npm ci
 
+# installed tailwindcss as a dependency
+RUN npm install tailwindcss 
+
 # Set environment variables
 ENV CI=true
 ENV PORT=3000
