@@ -1,7 +1,13 @@
+import DisplayJobs from "./components/DisplayJobs";
+import NavigationBar from "./components/NavigationBar";
+
 function App() {
   return (
-    <div className="App">
-      <div className="flex justify-center">GeoJobSearch</div>
+    <div>
+      <NavigationBar />
+      <main>
+        <DisplayJobs />
+      </main>
     </div>
   );
 }
