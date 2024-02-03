@@ -1,9 +1,13 @@
-import "./App.css";
+import DisplayJobs from "./components/DisplayJobs";
+import NavigationBar from "./components/NavigationBar";
 
 function App() {
   return (
-    <div className="App">
-      <div>GeoJobSearch</div>
+    <div>
+      <NavigationBar />
+      <main>
+        <DisplayJobs />
+      </main>
     </div>
   );
 }
