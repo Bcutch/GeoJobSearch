@@ -33,10 +33,10 @@ for i in range(scrapedPages):
 
     driver.quit()   # Close the browser window
 
-    i = 0
-    for job in jobData:
-        print(f'{i}: {job["title"]}: {job["url"]}')
-        i+=1
+    #i = 0
+    #for job in jobData:
+    #    print(f'{i}: {job["title"]}: {job["url"]}')
+    #    i+=1
 
 
 
