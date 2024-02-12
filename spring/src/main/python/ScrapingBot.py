@@ -28,13 +28,17 @@ for i in range(scrapedPages):
         driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
         url = driver.current_url # Save the new url that opens as the link for our job title
         jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
+
+        if jobSoup == None:     # if None return from BeautifulSoup then continue
+            continue
+
         title = jobSoup.find('h1', class_="jobsearch-JobInfoHeader-title").find('span').text # Code to get job title for given url
         jobData.append({'title': f'{title}', 'url': f'{url}'}) # Push to dictionary
 
     driver.quit()   # Close the browser window
 
-    #i = 0
-    #for job in jobData:
+    # i = 0
+    # for job in jobData:
     #    print(f'{i}: {job["title"]}: {job["url"]}')
     #    i+=1
 
