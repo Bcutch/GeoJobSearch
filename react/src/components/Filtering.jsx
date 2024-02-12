@@ -7,6 +7,7 @@ const Filtering = () => {
   const [jobType, setJobType] = useState("Job Type");
   const [remote, setRemote] = useState("Remote");
   const [salary, setSalary] = useState("Salary");
+  const [distance, setDistance] = useState("Distance");
 
   // Handler functions to update state based on the selected item's eventKey
   const handleJobTypeSelect = (eventKey) => {
@@ -19,6 +20,10 @@ const Filtering = () => {
 
   const handleSalarySelect = (eventKey) => {
     setSalary(eventKey);
+  };
+
+  const handleDistanceSelect = (eventKey) => {
+    setDistance(eventKey);
   };
 
   return (
@@ -39,6 +44,12 @@ const Filtering = () => {
         <Dropdown.Item eventKey="$100k-$150k">$100k-$150k</Dropdown.Item>
         <Dropdown.Item eventKey="$150k-$200k">$150k-$200k</Dropdown.Item>
         <Dropdown.Item eventKey="$200k+">$200k+</Dropdown.Item>
+      </DropdownButton>
+      <DropdownButton title={distance} onSelect={handleDistanceSelect}>
+        <Dropdown.Item eventKey=">20km">less than 20km</Dropdown.Item>
+        <Dropdown.Item eventKey=">50km">less than 50km</Dropdown.Item>
+        <Dropdown.Item eventKey=">100km">less than 100km</Dropdown.Item>
+        <Dropdown.Item eventKey=">150km">less than 150km</Dropdown.Item>
       </DropdownButton>
     </div>
   );
