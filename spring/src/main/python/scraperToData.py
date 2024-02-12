@@ -6,7 +6,7 @@ db = mysql.connector.connect(host="localhost", user="root", passwd="root", datab
 
 mycursor = db.cursor()
 
-#mycursor.execute("DROP TABLE job")
+mycursor.execute("DROP TABLE job")
 
 mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
     id INT AUTO_INCREMENT COMMENT 'Primary Key' PRIMARY KEY,
@@ -26,6 +26,9 @@ jobDict = ScrapingBot.jobData
 
 for job in jobDict:
     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
+    db.commit()
+
+db.close()
 
 # mycursor.execute("SELECT * FROM job")
 
