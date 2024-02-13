@@ -16,26 +16,45 @@
 # OPTIONAL: pip install pytest-cov
 
 
-
 # imports:
-import pytest      # testing module
-# path to file assumes pytest is run from the root directory (zenithProject)
-import spring.src.main.python.ScrapingBot as ScrapingBot     # ScrapingBot.py 
-
+import pytest                               # testing module
+from ...main.python import ScrapingBot      # ScrapingBot.py 
 
 
 # tests:
 # these functions don't have any naming restrictions from pytest
 # they are all named with the prefix 'test' to stay consistent
 
-def testJobsExist() -> None:
-    # check that jobData is not empty
-    assert ScrapingBot.jobData != []
+def testIndeedScraperWorks() -> None:
+    # test that indeed scraper populates jobData
+    indeedData = []
+    ScrapingBot.scrapeIndeed(numPages=1, jobData=indeedData)
 
-def testJobsHaveData() -> None:
-    # for each entry in jobData including title and url, there is a non-zero value
-    for entry in ScrapingBot.jobData:
+    for entry in indeedData:
         assert (len(entry["title"])) > 0
         assert (len(entry["url"])) > 0
-    
 
+def testIndeedScraperNoPages() -> None:
+    indeedData = []
+    ScrapingBot.scrapeIndeed(0, indeedData)
+
+    for entry in indeedData:
+        assert (len(entry["title"])) == 0
+        assert (len(entry["url"])) == 0
+
+def testLinkedInScraper() -> None:
+    # test that indeed scraper populates jobData
+    linkedInData = []
+    ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInData)
+
+    for entry in linkedInData:
+        assert (len(entry["title"])) > 0
+        assert (len(entry["url"])) > 0
+
+def testLinkedInScraperNoPages() -> None:
+    linkedInData = []
+    ScrapingBot.scrapeIndeed(0, linkedInData)
+
+    for entry in linkedInData:
+        assert (len(entry["title"])) == 0
+        assert (len(entry["url"])) == 0
