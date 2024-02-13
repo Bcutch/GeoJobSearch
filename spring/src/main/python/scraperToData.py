@@ -1,6 +1,10 @@
 import mysql.connector
 
-import ScrapingBot
+# imports will have different paths depending on where the file is run
+if __name__ == "__main__":      # if this file is directly run
+    import ScrapingBot
+else:                           # if this file is indirectly run
+    import spring.src.main.python.ScrapingBot as ScrapingBot
 
 db = mysql.connector.connect(host="localhost", user="root", passwd="root", database="testdb")
 

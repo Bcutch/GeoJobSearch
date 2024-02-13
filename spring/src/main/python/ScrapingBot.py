@@ -28,12 +28,18 @@ def scrapeIndeed(numPages, jobData):
             href = element.get('href') # Get link that the a is referencing to 
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
             url = driver.current_url # Save the new url that opens as the link for our job title
+            
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
-
             if jobSoup == None:     # if None return from BeautifulSoup then continue
                 continue
 
-            title = jobSoup.find('h1', class_="jobsearch-JobInfoHeader-title").find('span').text # Code to get job title for given url
+            header = jobSoup.find('h1', class_="jobsearch-JobInfoHeader-title")
+            if header == None:     # if None find from header then continue
+                continue
+
+            title = header.find('span').text # Code to get job title for given url
+            if title == None:      # if title not found then continue
+                continue
             jobData.append({'title': f'{title}', 'url': f'{url}'}) # Push to dictionary
 
         driver.quit()   # Close the browser window
