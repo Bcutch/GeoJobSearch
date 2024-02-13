@@ -1,4 +1,4 @@
-package com.example.cis4900.spring.template;
+package com.example.cis4900.spring.template.jobs.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -6,10 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Job {
+public class Job{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     private String title;
     private String company;
     private String location;
@@ -21,8 +21,20 @@ public class Job {
     private double latitude;
     private double longitude;
 
+    public Job () {
+
+    }
+
+    public Job (int id, String title, String url) {
+
+        this.id = id;
+        this.title = title;
+        this.url = url;
+
+    }
+
     // Getters
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
@@ -67,7 +79,7 @@ public class Job {
     }
 
     // Setters
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -110,5 +122,5 @@ public class Job {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-    
+
 }
