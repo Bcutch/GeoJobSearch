@@ -42,7 +42,7 @@ def testIndeedScraperNoPages() -> None:
         assert (len(entry["title"])) == 0
         assert (len(entry["url"])) == 0
 
-def testLinkedInScraper() -> None:
+def testLinkedInScraperWorks() -> None:
     # test that indeed scraper populates jobData
     linkedInData = []
     ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInData)

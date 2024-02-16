@@ -10,7 +10,7 @@ jobData = []
 
 def scrapeIndeed(numPages, jobData):
     # Loop for going through each page and getting all 15 jobs information
-    for i in range(scrapedPages):
+    for i in range(numPages):
         # Dynamic url that uses the other last query to change pages, increases by 20 everytime which is what brings you to a new page
         url = f"https://ca.indeed.com/jobs?q=python&l=&from=searchOnHP&vjk=1dbe12f243c824bf&start={i * 20}"
         
@@ -74,7 +74,7 @@ def scrapeLinkedIn(numPages, jobData):
 
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'html.parser')
-    print(soup)
+    # print(soup)
     driver.quit()
 
     # Loop to find all reference tags
