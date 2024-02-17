@@ -39,16 +39,16 @@ def testImproperPasswd():
     with pytest.raises(ConnectionError):
         scraperToDataConnection(passwd=improperPasswd)
 
-def testImproperTablename():
-    improperTablename = "ja,s1f#a sh!/"    # assuming we won't be naming a table the same name as this gibberish
+def testImproperdatabaseName():
+    improperdatabaseName = "ja,s1f#a sh!/"    # assuming we won't be naming a table the same name as this gibberish
     with pytest.raises(ConnectionError):
-        scraperToDataConnection(databaseName=improperTablename)
+        scraperToDataConnection(databaseName=improperdatabaseName)
 
 def testDatabaseClosesProperly():
     connection = scraperToDataConnection()
     assert connection.__del__() == True     # closing the database must occur correctly
 
-def testGetTablename():
+def testGetDatabaseName():
     connection = scraperToDataConnection()
     assert connection.getDatabaseName() == connection.databaseName   # returned table name must be the same
 
