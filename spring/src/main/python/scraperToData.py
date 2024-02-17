@@ -15,13 +15,16 @@ else:                           # imports when another file runs this
 # TODO: when the database is created, change the variable names to the new ones
 # or remove them from from the __init__ line as default variables and pass as parameters manually
 host = "localhost"
+# host = 'jdbc:mysql://mysql:3306'
 user = "root"
 passwd = "root"
+# passwd = 'pwd'
 databaseName = "testdb"
+# databaseName = 'template_db'
 tablename = "job"
 
 class scraperToDataConnection:
-    def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, 
+    def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
                  debugFeedback:bool=False) -> None:
         """ Summary:
             Creates a connection within the class for a continous connection to the database.
@@ -42,6 +45,7 @@ class scraperToDataConnection:
         self.__passwd = passwd
         # public variables
         self.databaseName = databaseName
+        self.tablename = tablename
         self.debugFeedback = debugFeedback
         
         # create database connection
@@ -111,7 +115,7 @@ class scraperToDataConnection:
             if self.debugFeedback: print(error)
             raise ConnectionError   # table could not be connected to
 
-    def tableExists(self, tablename:str) -> bool:
+    def tableExists(self, tablename:str=tablename) -> bool:
         """ Checks if table exists in current schema.
             
         Returns:
@@ -162,7 +166,13 @@ class scraperToDataConnection:
         self.cursor.clear_attributes()
         
     
-    def addJobData(self, jobData:dict) -> bool:
+    def addJobData(self, jobData:list) -> bool:
+        """ Adds data from a list in the format: [{dict}, {dict}, {dict}...]. 
+        Adds this data to the job sql table
+
+        Returns:
+            bool: Returns True if added the data successfully
+        """
         try:
             self.cursor = self.database.cursor()     # init cursor
             for job in jobData:
@@ -171,6 +181,8 @@ class scraperToDataConnection:
                                     ;""")
                 self.database.commit()  # commit insert to database
                 self.cursor.clear_attributes()
+            
+            return True
                 
         except Exception as error:
             if self.debugFeedback: print(error)
