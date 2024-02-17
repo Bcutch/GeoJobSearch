@@ -36,7 +36,7 @@ def testIndeedScraperWorks() -> None:
 
 def testIndeedScraperNoPages() -> None:
     indeedData = []
-    ScrapingBot.scrapeIndeed(0, indeedData)
+    ScrapingBot.scrapeIndeed(numPages=0, jobData=indeedData)
 
     for entry in indeedData:
         assert (len(entry["title"])) == 0
@@ -47,14 +47,20 @@ def testLinkedInScraper() -> None:
     linkedInData = []
     ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInData)
 
-    for entry in linkedInData:
+    for entry in linkedInData:      # test each possible entry that there is information found for each
         assert (len(entry["title"])) > 0
         assert (len(entry["url"])) > 0
+        assert (len(entry["location"])) > 0
 
 def testLinkedInScraperNoPages() -> None:
     linkedInData = []
-    ScrapingBot.scrapeIndeed(0, linkedInData)
+    ScrapingBot.scrapeIndeed(numPages=0, jobData=linkedInData)
 
-    for entry in linkedInData:
-        assert (len(entry["title"])) == 0
-        assert (len(entry["url"])) == 0
+    assert len(linkedInData) == 0   # asked for no pages, shouldnt scrape any pages
+
+
+def testLinkedInScraperNegativePages() -> None:
+    linkedInData = []
+    ScrapingBot.scrapeIndeed(numPages=-1, jobData=linkedInData)
+
+    assert len(linkedInData) == 0   # asked for negative pages and this shouldnt be possible
