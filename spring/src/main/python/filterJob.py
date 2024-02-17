@@ -6,14 +6,14 @@ db = mysql.connector.connect(host="localhost", user="root", passwd="root", datab
 
 mycursor = db.cursor()
 
-#function to be called to return the dict with filtered jobs
+#function to be called to return the list of jobs with filtered jobs
 def filter(filterBy, filterArg):
 
-    retDict = []
+    retList = []
 #select statement using arguments
     mycursor.execute("""SELECT * FROM job WHERE %s = '%s';""" % (filterBy, filterArg))
 
     for i in mycursor:
-        retDict.append(i)
+        retList.append(i)
 
-    return retDict
+    return retList
