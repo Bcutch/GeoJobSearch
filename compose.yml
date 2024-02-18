@@ -12,7 +12,8 @@ services:
       - DB_PASSWORD=pwd
     networks:
       - spring-mysql    # Allow the spring app to discover the mysql app
-      - spring-react    # Allow the spring app to talk to the react app
+      - spring-react
+      - spring-python    # Allow the spring app to talk to the react app
 
   mysql:
     build: ./mysql    # Look for Dockerfile in this path
@@ -26,7 +27,13 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - spring-mysql    # Allow the mysql app to talk to the spring app
-    
+  
+  python:
+    build: ./python
+
+    networks:
+      - spring-python
+
   react:
     build: ./react    # Look for Dockerfile in this path
     ports:
@@ -44,3 +51,4 @@ volumes:
 networks:               
   spring-mysql:
   spring-react:
+  spring-python:
