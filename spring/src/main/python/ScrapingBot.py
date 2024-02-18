@@ -112,7 +112,7 @@ def scrapeLinkedIn(numPages:int, jobData:list):
     # Open URL and wait for everything to load
     driver.get(linkedInUrl)
     driver.implicitly_wait(1)
-    print(driver)
+    # print(driver)
 
     last_height = 0 
     try:
@@ -120,6 +120,7 @@ def scrapeLinkedIn(numPages:int, jobData:list):
     except Exception as error:  # failed to connect to URL
         # no scroll height
         last_height = -1
+        raise ConnectionError
     pagesScraped = 0 #One page scraped equals one scroll to bottom due to infinite loading
     
     # Scrolls to bottom numPages times since linkedin uses infinite scrolling instead of pages
@@ -170,6 +171,7 @@ def scrapeLinkedIn(numPages:int, jobData:list):
         # detailsDriver.get(currentJobIdUrl+currentJobId)
         
         # print(f"link: {currentJobIdUrl+currentJobId}")
+        # print('url',url)
         
 
         # get soup for more details info
@@ -178,12 +180,17 @@ def scrapeLinkedIn(numPages:int, jobData:list):
         # scrap data
         title       = jobListing.find('h3', class_='base-search-card__title').text.strip() #title is printed with 3 new lines so use strip just to get title
         location     = jobListing.find('span', class_="job-search-card__location").text.strip()
-        dateTime    = jobListing.find('time').get('datetime')       # gets date as format: yyyy-mm-dd
+        postingdate    = jobListing.find('time').get('datetime')       # gets date as format: yyyy-mm-dd
         company     = jobListing.find('h4', class_='base-search-card__subtitle').text.strip()
         # topcard       = detailsSoup.find('div', class_="topcard__flavor-row")
         # if topcard != None: place = topcard.find('a', class_="topcard__org-name-link")
         # if place != None:   location = place.text.strip() + ', ' + location
         coreInfo     = detailsSoup.find_all('li', class_="description__job-criteria-item")
+        description  = detailsSoup.find('div', 'show-more-less-html__markup')
+        if description != None:
+            description = description.text
+        else:
+            description = 'NULL'
         
         jobType = None
         field = None
@@ -195,6 +202,9 @@ def scrapeLinkedIn(numPages:int, jobData:list):
                 
             if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Job function':
                 field = element.find('span', class_ = 'description__job-criteria-text').text.strip()
+            
+            if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Seniority level':
+                seniority = element.find('span', class_ = 'description__job-criteria-text').text.strip()
         
         salary = detailsSoup.find('div', class_='salary')
         if salary != None: 
@@ -212,12 +222,13 @@ def scrapeLinkedIn(numPages:int, jobData:list):
         # f = open('demofileDetails.txt', "w", encoding="utf-8")
         # f.write(str(detailsSoup.find_all()))
         # f.close()
-        # time.sleep(3)
+        time.sleep(3)
         
     
         jobData.append({'title': f'{title}', 'url': f'{url}', 'company':f'{company}', 
-                        'location':f'{location}', 'dateTime':f'{dateTime}',
-                        'jobType':f'{jobType}', 'field':f'{field}', 'salary':f'{salary}'}) # add to dictionary
+                        'location':f'{location}', 'postingdate':f'{postingdate}',
+                        'jobType':f'{jobType}', 'field':f'{field}', 'salary':f'{salary}',
+                        'seniority':f'{seniority}', 'description':f'{description}'}) # add to dictionary
         count += 1
         if count == limit: break
         
