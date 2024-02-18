@@ -1,3 +1,7 @@
 selenium
 beautifulsoup4
 mysql-connector-python
+<<<<<<< HEAD
+=======
+pytest
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)

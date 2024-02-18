@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import time, json
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -78,24 +79,36 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         # Open URL and wait for everything to load
         driver.get(url)
 =======
+=======
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 import time
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+<<<<<<< HEAD
 time.sleep(60)
+=======
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 1
 SCROLL_PAUSE_TIME = 2.5
 # Empty Array To Store Dictionaries With Job Data
 jobData = []
+<<<<<<< HEAD
 serverURL = "http://selenium:4444/wd/hub"
+=======
+serverURL = "http://172.17.0.2:4444/wd/hub"
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 
 options = webdriver.ChromeOptions()
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Remote(command_executor=serverURL, options=options)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -105,13 +118,17 @@ def scrapeIndeed(numPages, jobData, driver):
         # Open URL and wait for everything to load
         driver.get(url)
         driver.implicitly_wait(10)
+<<<<<<< HEAD
 >>>>>>> 837dca4 (fixed merge conflict)
+=======
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
         # Get Dynamic url as page source for beautiufl soup to parse through the website
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
         # Loop to go through each reference tag, and run the driver for that specific link so that you can get the active link
         for element in soup.find_all('a', class_="jcs-JobTitle"):
+<<<<<<< HEAD
 <<<<<<< HEAD
             time.sleep(0.5)
             href = element.get('href') # Get link that the a is referencing to 
@@ -440,6 +457,10 @@ for element in tempData:
 =======
             href = element.get('href') # Get link that the a is referencing to 
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+=======
+            href = element.get('href') # Get link that the a is referencing to 
+            # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -487,11 +508,15 @@ def scrapeLinkedIn(numPages, jobData, driver):
     soup = BeautifulSoup(page_source, 'html.parser')
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     driver.quit()
 >>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======
 >>>>>>> 9d74044 (Fixed compose.yml issues)
+=======
+    driver.quit()
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -499,6 +524,7 @@ def scrapeLinkedIn(numPages, jobData, driver):
         url = element.get('href')
         jobData.append({'title': f'{title}', 'url': f'{url}'}) # add to dictionary
 
+<<<<<<< HEAD
 scrapeIndeed(scrapedPages, jobData, driver)
 # scrapeLinkedIn(scrapedPages, jobData, driver)
 
@@ -520,3 +546,11 @@ driver.quit()
 driver.quit()
 >>>>>>> 9d74044 (Fixed compose.yml issues)
 >>>>>>> 4bfd60b (Fixed compose.yml issues, fixed merge)
+=======
+print('Scraping Jobs')
+# scrapeIndeed(scrapedPages, jobData, driver)
+scrapeLinkedIn(scrapedPages, jobData, driver)
+print('Succesfully Scraped')
+for element in jobData:
+       print(f"{element['title']}: {element['url']}")
+>>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
