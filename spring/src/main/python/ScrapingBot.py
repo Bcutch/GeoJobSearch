@@ -1,6 +1,8 @@
-import time
+import time, random
 from selenium import webdriver
 from bs4 import BeautifulSoup
+
+random.seed(time.time())
 
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 3
@@ -46,7 +48,7 @@ def scrapeIndeed(numPages, jobData):
         
 
 
-def getSoupforLinkedIn(url:str, iterations:int=0) -> BeautifulSoup:
+def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.ChromeOptions = None, numPages:int = 0) -> BeautifulSoup:
     """ This function takes in a driver, and url and will return the Beautiful soup for the
     associated linked in page if one is found. This is needed because LinkedIn will popup an 
     auth_wall sign in page after 3 quick consecutive searches. This function gets around this
@@ -54,52 +56,124 @@ def getSoupforLinkedIn(url:str, iterations:int=0) -> BeautifulSoup:
 
     Args:
         url (str): URL that will be searched
+        driver (webdriver.Chrome): webdriver that will be used
+        numPages(int): If true, will scroll for number of pages given. Default=0
 
     Returns:
         BeautifulSoup: Returns the BeautifulSoup class if found. Returns None if nothing is found
     """
-    # Open URL and wait for everything to load
-    driver = webdriver.Chrome()
-    driver.get(url)
-    driver.implicitly_wait(2)
-    time.sleep(3)
-    driver.refresh()
     
+    # variables
     soup = None
+    _options = options
+    if _options == None:
+        _options = webdriver.ChromeOptions()
+        _options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
+    maxTimeoutAttempts = 10        # number of attempts to be made before a timeout error is raised
+    timeoutAttempts = 0
+    sleepSecondsLoaded = 3         # number of seconds to wait after a page loaded successfully
+    sleepSecondsAuth = 6            # number of seconds to wait after a page is auth wall
+    pageKey = None                  # pagekey of loaded linkedIn page
+    authWallPrefix = "auth_wall"
     
-    timeout = 10
-    while iterations < timeout:     # loop until a none auth_wall page is found
+    try:
+        # Open URL and wait for everything to load
+        driver.get(url)
+        time.sleep(sleepSecondsLoaded)
         
-        # get page
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
-        if soup == None: return None    # page not found
-        # print(soup)
-
-        # if page is auth_wall, refresh
-        meta = soup.find('meta')
-        if meta != None: pageKey = meta.get("content")
-
-        # continue refresh until no auth_wall
-        if pageKey != None and pageKey[:9] == "auth_wall":
-            driver.quit()
-            # driver.implicitly_wait(1)
-            time.sleep(1)
-            return getSoupforLinkedIn(url, iterations + 1)
+        #
+        # if scrolling required, scroll
+        #
+        if numPages > 0:
+            last_height = 0 
+            try:
+                last_height = driver.execute_script("return document.body.scrollHeight")
+            except Exception as error:  # failed to scroll
+                # no scroll height
+                last_height = -1
+                raise ConnectionError("Failed to get last_height")
+            pagesScraped = 0 #One page scraped equals one scroll to bottom due to infinite loading
             
+            # Scrolls to bottom numPages times since linkedin uses infinite scrolling instead of pages
+            while pagesScraped < numPages and last_height > -1:
+                pagesScraped += 1
+                # Scroll down to bottom
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-            
-        else:
-            break
-    # print("start")
-    # for item in driver.get_cookies():
-    #     print(item)
-    # print("end")
-    # if timeout reached, raise error
-    if timeout <= iterations:
-        raise TimeoutError("Could not get pass LinkedIn Authentication Login Wall")
+                # Wait to load page
+                time.sleep(SCROLL_PAUSE_TIME)
+
+                # Calculate new scroll height and compare with last scroll height
+                new_height = driver.execute_script("return document.body.scrollHeight")
+                if new_height == last_height:
+                    break
+                last_height = new_height
         
+        
+        #
+        #   loop until a not auth_wall page is found
+        #
+        while (pageKey != None and pageKey[:len(authWallPrefix)] == authWallPrefix) or pageKey == None:    
+            # if timeout, raise error
+            if timeoutAttempts >= maxTimeoutAttempts:
+                raise TimeoutError(f"Max timeouts attempts ({timeoutAttempts} of {maxTimeoutAttempts}) reached searching LinkedIn")
+            timeoutAttempts += 1
+                
+            # get page
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            if soup == None: raise ConnectionError("Could not find Soup for linkedIn")    # page not found
+
+            # get page header info
+            meta = soup.find('meta')
+            pageKey = None
+            if meta != None: pageKey = meta.get("content")
+            
+            # check for net error
+            netError = soup.find('body', class_='neterror')     # if class is net error
+            # check for load error
+            bodyError = soup.find('body')      
+            if bodyError != None: bodyError = str(bodyError) == "<body></body>"     # if body is empty
+            # reset = random.choices((True, False), (0.1, 0.9))      # randomly reset driver or target will refuse connection at some point
+            reset = False
+            # if net error or load error
+            if netError != None or bodyError == True or reset: 
+                #  reload driver
+                if reset: print("Random Reset")
+                if netError: print("net error")
+                if bodyError: print("body error")
+                driver.quit()
+                driver = None
+                time.sleep(1)
+                
+                driver = webdriver.Chrome(options=_options)
+                driver.implicitly_wait(10)
+                driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
+                time.sleep(1)
+                driver.get(url)
+                time.sleep(1)
+                # driver.refresh()
+                
+                # raise ConnectionError("found net error")
+                
+
+            # continue until no auth_wall or timeout
+            if pageKey != None and pageKey[:len(authWallPrefix)] == authWallPrefix:
+                driver.get(url)
+                time.sleep(sleepSecondsAuth)
     
+    except ConnectionRefusedError as cre:
+        print(cre)
+        print("LinkedIn Refused Connection, cannot get soup.")
+    
+    except Exception as Error:
+        # driver.quit()
+        f = open('soupResult.txt', "w", encoding="utf-8")
+        if soup != None: f.write(str(soup.find_all()))
+        # f.write(str(str(soup.find('body')) == "<body></body>"))
+        f.close()
+        print(Error)
+        raise ConnectionError("An Error occured while retrieving soup for linkedIn")
+            
     return soup
     
 
@@ -108,140 +182,176 @@ def scrapeLinkedIn(numPages:int, jobData:list):
     if numPages <= 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
         return 
     linkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
-    driver = webdriver.Chrome()
+    
+    # init driver
+    options = webdriver.ChromeOptions()
+    options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
+    driver = webdriver.Chrome(options=options)
+    driver.implicitly_wait(10)
+    driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
+    
     # Open URL and wait for everything to load
-    driver.get(linkedInUrl)
-    driver.implicitly_wait(1)
-    # print(driver)
-
-    last_height = 0 
+        
+    soup = getSoupforLinkedIn(url=linkedInUrl, driver=driver, numPages=numPages)
+    if soup == None: raise ConnectionError("Could not get any info for linkedIn")
+    
     try:
-        last_height = driver.execute_script("return document.body.scrollHeight")
-    except Exception as error:  # failed to connect to URL
-        # no scroll height
-        last_height = -1
-        raise ConnectionError
-    pagesScraped = 0 #One page scraped equals one scroll to bottom due to infinite loading
-    
-    # Scrolls to bottom numPages times since linkedin uses infinite scrolling instead of pages
 
-    
-    while pagesScraped < numPages and last_height > -1:
-        pagesScraped += 1
-        # Scroll down to bottom
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # Wait to load page
-        time.sleep(SCROLL_PAUSE_TIME)
-
-        # Calculate new scroll height and compare with last scroll height
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height = new_height
-
-    page_source = driver.page_source
-    soup = BeautifulSoup(page_source, 'html.parser')
-    # print(type(soup))
-    # print(soup)
-    driver.quit()
-    
-    # f = open('demofile.txt', "w", encoding="utf-8")
-    # f.write(str(soup.find_all()))
-    # f.close()
-    # detailsDriver = webdriver.Chrome()
-    
-    count = 0
-    limit = 3
-
-    # Loop to find all reference tags
-    for jobListing in soup.find_all('div', class_='base-card'):
-        url = jobListing.find('a', class_='base-card__full-link').get('href')
-        # currentJobId= jobListing.get('data-entity-urn').split(":")[-1]
-
-        # locaiton yes
-        # salary
-        # field
-        # remote
-        # job type
-        
-        # must open page to find more information
-        # Open URL and wait for everything to load
-        # currentJobIdUrl = "https://www.linkedin.com/jobs/search?currentJobId="
-        # detailsDriver.get(currentJobIdUrl+currentJobId)
-        
-        # print(f"link: {currentJobIdUrl+currentJobId}")
-        # print('url',url)
-        
-
-        # get soup for more details info
-        detailsSoup = getSoupforLinkedIn(url)
-        
-        # scrap data
-        title       = jobListing.find('h3', class_='base-search-card__title').text.strip() #title is printed with 3 new lines so use strip just to get title
-        location     = jobListing.find('span', class_="job-search-card__location").text.strip()
-        postingdate    = jobListing.find('time').get('datetime')       # gets date as format: yyyy-mm-dd
-        company     = jobListing.find('h4', class_='base-search-card__subtitle').text.strip()
-        # topcard       = detailsSoup.find('div', class_="topcard__flavor-row")
-        # if topcard != None: place = topcard.find('a', class_="topcard__org-name-link")
-        # if place != None:   location = place.text.strip() + ', ' + location
-        coreInfo     = detailsSoup.find_all('li', class_="description__job-criteria-item")
-        description  = detailsSoup.find('div', 'show-more-less-html__markup')
-        if description != None:
-            description = description.text
-        else:
-            description = 'NULL'
-        
-        jobType = None
-        field = None
-        for element in coreInfo:
-            # print(element)
-            # print()
-            if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Employment type':
-                jobType = element.find('span', class_ = 'description__job-criteria-text').text.strip()
+        # Loop to find all reference tags
+        for jobListing in soup.find_all('div', class_='base-card'):
+            url = jobListing.find('a', class_='base-card__full-link').get('href')
+            
+            # get soup for more details info
+            detailsSoup = getSoupforLinkedIn(url=url, driver=driver)
+            if detailsSoup == None: 
+                driver.quit()
+                return jobData
+            
+            # scrap data
+            title       = jobListing.find('h3', class_='base-search-card__title').text.strip() #title is printed with 3 new lines so use strip just to get title
+            location     = jobListing.find('span', class_="job-search-card__location").text.strip()
+            postingdate    = jobListing.find('time').get('datetime')       # gets date as format: yyyy-mm-dd
+            company     = jobListing.find('h4', class_='base-search-card__subtitle').text.strip()
+            
+            coreInfo     = detailsSoup.find_all('li', class_="description__job-criteria-item")
+            description  = detailsSoup.find('div', 'show-more-less-html__markup')
+            if description != None:
+                description = str(description.text)
+            else:
+                description = None
+            
+            jobType = None
+            field = None
+            seniority = None
+            for element in coreInfo:
+                if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Employment type':
+                    jobType = str(element.find('span', class_ = 'description__job-criteria-text').text.strip())
+                    
+                if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Job function':
+                    field = str(element.find('span', class_ = 'description__job-criteria-text').text.strip())
                 
-            if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Job function':
-                field = element.find('span', class_ = 'description__job-criteria-text').text.strip()
+                if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Seniority level':
+                    seniority = str(element.find('span', class_ = 'description__job-criteria-text').text.strip())
             
-            if element.find('h3', class_ = 'description__job-criteria-subheader').text.strip() == 'Seniority level':
-                seniority = element.find('span', class_ = 'description__job-criteria-text').text.strip()
+            salary = detailsSoup.find('div', class_='salary')
+            if salary != None: 
+                salary = str(salary.text)
+            else:
+                salary = None
+            
+            # f = open('demofileDetails.txt', "w", encoding="utf-8")
+            # f.write(str(detailsSoup.find_all()))
+            # f.close()
+            
         
-        salary = detailsSoup.find('div', class_='salary')
-        if salary != None: 
-            salary = salary.text.strip()
-        else:
-            salary = 'NULL'
-            
-            
-        # print(salary)
-                
-        
+            jobData.append({'title': f'{title}', 'url': f'{url}', 'company':f'{company}', 
+                            'location':f'{location}', 'postingdate':f'{postingdate}',
+                            'jobType':jobType, 'field':f'{field}', 'salary':salary,
+                            'seniority':seniority, 'description':description}) # add to dictionary
+    finally:
+        # count += 1
+        # if count == limit: break
+        driver.quit()
 
-        # print(coreInfo)
-        
-        # f = open('demofileDetails.txt', "w", encoding="utf-8")
-        # f.write(str(detailsSoup.find_all()))
-        # f.close()
-        time.sleep(3)
-        
+# def testFunc() -> None:
+#     timeoutSeconds = 20     # an error will be thrown if webdriver cannot load a page in 20 seconds
+#     start = time.time()
+#     auth_counter = 0
+#     good_counter = 0
     
-        jobData.append({'title': f'{title}', 'url': f'{url}', 'company':f'{company}', 
-                        'location':f'{location}', 'postingdate':f'{postingdate}',
-                        'jobType':f'{jobType}', 'field':f'{field}', 'salary':f'{salary}',
-                        'seniority':f'{seniority}', 'description':f'{description}'}) # add to dictionary
-        count += 1
-        if count == limit: break
+#     waitSeconds_norm = 1            # wait time after a successful page find
+#     waitSeconds_auth = 3            # wait time after hit with auth page
+#     linkedInUrl = "https://www.linkedin.com/jobs/search?position=1&pageNum=0"
+#     badsite = "http://nasufaishfbaojkflabhigudhasbdfhosgvdhasihbgfafm.ca/"
+#     driver = webdriver.Chrome()
+#     driver.set_page_load_timeout(timeoutSeconds)
+#     # driver.implicitly_wait(10)
+#     timeoutOccured = False
+#     try:
+#         for i in range(10):
+#             driver.get(linkedInUrl)
+#             time.sleep(waitSeconds_norm)
+#             soup = BeautifulSoup(driver.page_source, 'html.parser')
+#             if soup == None: return None    # page not found
+#             meta = soup.find('meta')
+#             if meta != None: pageKey = meta.get("content")
+#             # continue refresh until no auth_wall
+#             if pageKey != None: print(pageKey[:9])
+#             timeoutCounter = 0
+#             while (pageKey != None and pageKey[:9] == 'auth_wall') or pageKey == None:
+#                 auth_counter += 1
+#                 timeoutCounter += 1
+#                 time.sleep(waitSeconds_auth)
+                
+#                 driver.get(linkedInUrl)
+#                 # driver.refresh()
+#                 soup = BeautifulSoup(driver.page_source, 'html.parser')
+#                 if soup == None: return None    # page not found
+#                 meta = soup.find('meta')
+#                 if meta != None: pageKey = meta.get("content")
+                
+#                 if timeoutCounter >= 10:
+#                     timeoutOccured = True
+#                     pageKey = "timeout"
+            
+#             if pageKey != None and pageKey != 'timeout':
+#                 good_counter += 1
         
-        # return
+#     except Exception as Error:
+#         print(Error)
+#     finally:
+#         driver.quit()
+        
+#     end = time.time()
     
+#     print("elapsed: ",end-start)
+#     print(f"timeoutOccured: {timeoutOccured}\n")
+#     print("waitSeconds_norm:", waitSeconds_norm)
+#     print("waitSeconds_auth:", waitSeconds_auth)
+#     print(f"{good_counter}/{auth_counter} good/bad")
+#     print(f"{(end-start) / good_counter} seconds per good one")
+    
+#     # buildString = "------------------------\n"
+#     # buildString += f"Elapsed {end-start}\n"
+#     # buildString += f"timeoutOccured: {timeoutOccured}\n"
+#     # buildString += f"waitSeconds_norm: {waitSeconds_norm}\n"
+#     # buildString += f"waitSeconds_auth: {waitSeconds_auth}\n"
+#     # buildString += f"{good_counter}/{auth_counter} good/bad\n"
+#     # buildString += f"{(end-start) / good_counter} seconds per good one\n"
+    
+#     # print(buildString)
+#     # return buildString
+    
+    
+
+# myString = ""
+# for norm in range(1,6):
+#     for auth in range(1,6): 
+#         myString += testFunc(waitSeconds_norm=norm, waitSeconds_auth=auth)
+#         myString += "\n"
+
+# f = open('resultsofTesting.txt', "w", encoding="utf-8")
+# f.write(myString)
+# f.close()
+
 
 # tempData = []
 # testlinkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
-# # testdriver = webdriver.Chrome()
-# # testdriver.quit()
+# options = webdriver.ChromeOptions()
+# options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
+# testdriver = webdriver.Chrome(options=options)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# getSoupforLinkedIn(url=testlinkedInUrl, driver=testdriver)
+# testdriver.quit()
 
 
 # scrapeLinkedIn(1,tempData)
 
-# for entry in tempData:
-#     print(entry)
+# f = open('linkedScrapedDataTest.txt', "w", encoding="utf-8")
+# f.write(str(tempData))
+# f.close()
