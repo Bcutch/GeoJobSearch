@@ -2,6 +2,7 @@ import time
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+# Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
 time.sleep(60)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 1

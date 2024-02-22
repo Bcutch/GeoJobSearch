@@ -1,9 +1,2 @@
-How to run Selenium on Docker:
-
-1. Execute this command in terminal:  docker pull selenium/standalone-chrome
-2. Once this is done, Execute the following in a seperate terminal: “docker run --rm -it -p 4444:4444 -p 7900:7900 --shm-size 2g selenium/standalone-chrome”
-3. The last line will give you the ip to run: 22:24:58.700 INFO [Standalone.execute] - Started Selenium Standalone 4.17.0 (revision e52b1be057*):http://172.17.0.2:4444 (Not sure if this IP is different for everyone)
-4. Once you run this you can then run docker compose up and run ONE of the scraping functions (only working with linkedin right now)
-5. To run it, cd to the python container, then do: docker build -t test .
-6. once this is done, make sure the standalone chrome container is running, then do: docker run test
-7. If you want to run a different scraping function or re run the same one, you close the standalone chrome that is executing in your seperate terminal and re run the command on line 2
+Before Running, Execute the following command to ensure your device has the standalone chrome docker image available:
+docker pull selenium/standalone-chrome
