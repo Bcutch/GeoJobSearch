@@ -31,16 +31,38 @@ def testIndeedScraperWorks() -> None:
     ScrapingBot.scrapeIndeed(numPages=1, jobData=indeedData)
 
     for entry in indeedData:
-        assert (len(entry["title"])) > 0
-        assert (len(entry["url"])) > 0
+        # these values should never be none
+        assert (entry["title"])         != None
+        assert (entry["url"])           != None
+        assert (entry["company"])       != None
+        assert (entry["location"])      != None
+        assert (entry["postingdate"])   != None
+        
+        # these values should never be empty
+        assert (entry["jobType"])       != ""
+        assert (entry["salary"])        != ""
+        assert (entry["description"])   != ""
+        
+        # remote is a bool, either true or false always
+        assert ((entry["remote"])        == True or (entry["remote"]) == False)
 
 def testIndeedScraperNoPages() -> None:
     indeedData = []
-    ScrapingBot.scrapeIndeed(numPages=0, jobData=indeedData)
+    with pytest.raises(ValueError):
+        ScrapingBot.scrapeIndeed(numPages=0, jobData=indeedData)
+    
+def testIndeedScraperBadListInput() -> None:
+    
+    with pytest.raises(ValueError):
+        linkedInData = 'this is a string'
+        ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInData, jobLimit=5)
+        
+def testLinkedInScraperNegativePages() -> None:
+    linkedInData = []
+    with pytest.raises(ValueError):
+        ScrapingBot.scrapeIndeed(numPages=-1, jobData=linkedInData)
 
-    for entry in indeedData:
-        assert (len(entry["title"])) == 0
-        assert (len(entry["url"])) == 0
+        
 
 def testLinkedInScraper() -> None:
     # test that indeed scraper populates jobData
@@ -78,9 +100,8 @@ def testLinkedInScraper() -> None:
 def testLinkedInScraperNoPages() -> None:
     
     linkedInData = []
-    ScrapingBot.scrapeLinkedIn(numPages=0, jobData=linkedInData, jobLimit=5)
-
-    assert len(linkedInData) == 0   # asked for no pages, shouldnt scrape any pages
+    with pytest.raises(ValueError):     # asked for no pages, shouldnt scrape any pages
+        ScrapingBot.scrapeLinkedIn(numPages=0, jobData=linkedInData, jobLimit=5)
     
 def testLinkedInScraperBadListInput() -> None:
     
@@ -90,6 +111,6 @@ def testLinkedInScraperBadListInput() -> None:
 
 def testLinkedInScraperNegativePages() -> None:
     linkedInData = []
-    ScrapingBot.scrapeIndeed(numPages=-1, jobData=linkedInData)
+    with pytest.raises(ValueError):
+        ScrapingBot.scrapeLinkedIn(numPages=-1, jobData=linkedInData)
 
-    assert len(linkedInData) == 0   # asked for negative pages and this shouldnt be possible
