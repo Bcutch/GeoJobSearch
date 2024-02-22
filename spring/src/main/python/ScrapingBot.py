@@ -194,12 +194,13 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
     
 
 
-def scrapeLinkedIn(numPages:int, jobData:list) -> None:
+def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     """ Scrapes linkedin Website and saves found jobs to jobData
 
     Args:
         numPages (int): number of pages to scrape from linkedIn
         jobData (list): list of dictionaries that this function will fill
+        limit (int): sets a limit for the number of job listings that will be scraped. If Below 0, will scrape with no limit. Defaults to -1.
 
     Raises:
         ConnectionError: if anything goes wrong connecting to linkedIn, this will be raised
@@ -207,7 +208,9 @@ def scrapeLinkedIn(numPages:int, jobData:list) -> None:
         RuntimeError: General error. if anything goes wrong, this will be raised
 
     """
-    if numPages <= 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
+    if type(jobData) != list: raise ValueError("jobData type not a list")
+    
+    if numPages <= 0 or jobLimit == 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
         return 
     linkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
     
@@ -223,8 +226,8 @@ def scrapeLinkedIn(numPages:int, jobData:list) -> None:
     soup = getSoupforLinkedIn(url=linkedInUrl, driver=driver, options=options, numPages=numPages)
     if soup == None: raise ConnectionError("Could not get any info for linkedIn")
     
+    jobCount = 0
     try:
-
         # Loop to find all reference tags
         for jobListing in soup.find_all('div', class_='base-card'):
             if jobListing == None: raise ModuleNotFoundError("jobListing should have been found")
@@ -275,12 +278,19 @@ def scrapeLinkedIn(numPages:int, jobData:list) -> None:
                             'location':f'{location}', 'postingdate':f'{postingdate}',
                             'jobType':jobType, 'field':f'{field}', 'salary':salary,
                             'seniority':seniority, 'description':description}) # add to dictionary
+            
+            jobCount += 1
+            if jobLimit > 0 and jobCount >= jobLimit:   # if jobLimit is not negative and job count has passed limit
+                driver.quit()                       # stop scraping
+                return
+            
     except Exception as error:
+        print(error)
         raise RuntimeError("An error occured while scraping LinkedIn")
     finally:
         driver.quit()
 
-# tempData = []
-
-# scrapeLinkedIn(1,tempData)
+# # tempData = []
+# tempData = "jfhuadhga"
+# scrapeLinkedIn(0,tempData, jobLimit=1)
 
