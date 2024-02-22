@@ -55,6 +55,13 @@ services:
     networks:
       - spring-python
 
+  selenium:
+    image: selenium/standalone-chrome
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    networks:
+      - spring-python
 volumes:
   mariadb_data:
 
