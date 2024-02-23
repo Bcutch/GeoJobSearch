@@ -16,6 +16,8 @@ services:
 
   mysql:
     build: ./mysql    # Look for Dockerfile in this path
+    ports:
+      - "3306:3306"
     environment:
       # Mysql docker image env vars
       - MYSQL_ROOT_PASSWORD=pwd

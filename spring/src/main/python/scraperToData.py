@@ -1,6 +1,12 @@
 import mysql.connector
 
-import ScrapingBot
+# I can't get the local imports to work when running the file directly
+# this works but if there is a better way to do this then please change.
+# - Jacob
+if __name__ == "__main__":      # imports when running file
+    import ScrapingBot          
+else:                           # imports when another file runs this
+    from . import ScrapingBot
 
 db = mysql.connector.connect(host="localhost", user="root", passwd="root", database="testdb")
 
