@@ -21,7 +21,7 @@ def filter(filterSettings):
     firstDone = False
 
     if filterSettings[0]:
-        select = select + " title = " + filterSettings[1]
+        select = select + " title = '" + filterSettings[1] + "'"
         firstDone = True
 
     if filterSettings[2]:
@@ -30,44 +30,51 @@ def filter(filterSettings):
         else:
             firstDone = True
 
-        select = select + " location = " + filterSettings[3]
+        select = select + " location = '" + filterSettings[3] + "'"
 
     if filterSettings[4]:
         if firstDone:
             select = select + " AND "
         else:
             firstDone = True
-        select = select + " salary = " + filterSettings[5]
+        select = select + " salary = '" + filterSettings[5] + "'"
 
     if filterSettings[6]:
         if firstDone:
             select = select + " AND "
         else:
             firstDone = True
-        select = select + " field = " + filterSettings[7]
+        select = select + " field = '" + filterSettings[7] + "'"
 
     if filterSettings[8]:
         if firstDone:
             select = select + " AND "
         else:
             firstDone = True
-        select = select + " is_remote = " + filterSettings[9]
+        select = select + " is_remote = '" + filterSettings[9] + "'"
 
-# job type doesn't exist in database yet
+    # job type doesn't exist in database yet
 
-#    if filterSettings[10]:
-#        if firstDone:
-#            select = select + " AND "
-#        else:
-#            firstDone = True
-#        select = select + " job_type = " + filterSettings[11] 
+    #if filterSettings[10]:
+    #    if firstDone:
+    #        select = select + " AND "
+    #    else:
+    #        firstDone = True
+    #    select = select + " job_type = " + filterSettings[11]  + "'"
         
     select = select + ";"
 
-# select statement using created select statement
+    print(select)
+
+    # select statement using created select statement
     mycursor.execute(select)
 
     for i in mycursor:
         retList.append(i)
 
+    mycursor.close()
+    db.close()
+
     return retList
+
+    

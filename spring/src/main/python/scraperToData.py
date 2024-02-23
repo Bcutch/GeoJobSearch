@@ -34,6 +34,7 @@ for job in jobDict:
     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
     db.commit()
 
+mycursor.close()
 db.close()
 
 # mycursor.execute("SELECT * FROM job")
