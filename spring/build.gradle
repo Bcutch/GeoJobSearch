@@ -17,9 +17,13 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+<<<<<<< HEAD
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'mysql:mysql-connector-java:8.0.23'
+=======
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+>>>>>>> d8be8dc (fixed file structure for backend, created devcontainers for docker, create simplae route in backend, chnaged from maven to gradle for building and updated dockerfile to work with it.)
 }
 
 tasks.named('test') {

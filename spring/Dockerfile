@@ -4,6 +4,7 @@ FROM eclipse-temurin:21-jammy as build
 # Set the working directory inside the Docker image
 WORKDIR /workspace/app
 
+<<<<<<< HEAD
 # Copy the Gradle wrapper and necessary files
 COPY gradlew .
 COPY gradle gradle
@@ -35,3 +36,12 @@ EXPOSE 8080
 
 # Command to run the application. Adjust if you perform a build and run a JAR file instead
 CMD ["./gradlew", "bootRun"]
+=======
+## Copy neccessary files for building the java project
+COPY gradlew .
+RUN chmod +x ./gradlew
+COPY gradle ./gradle
+COPY build.gradle .
+RUN ./gradlew wrapper
+COPY src src
+>>>>>>> d8be8dc (fixed file structure for backend, created devcontainers for docker, create simplae route in backend, chnaged from maven to gradle for building and updated dockerfile to work with it.)

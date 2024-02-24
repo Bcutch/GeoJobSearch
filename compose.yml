@@ -12,9 +12,14 @@ services:
       - DB_USER=root
       - DB_PASSWORD=pwd
     networks:
+<<<<<<< HEAD
       - spring-mysql    # Allow the spring app to discover the mysql app
       - spring-react
       - spring-python    # Allow the spring app to talk to the react app
+=======
+      - spring-mysql # Allow the spring app to discover the mysql app
+      - spring-react # Allow the spring app to talk to the react app
+>>>>>>> d8be8dc (fixed file structure for backend, created devcontainers for docker, create simplae route in backend, chnaged from maven to gradle for building and updated dockerfile to work with it.)
 
   mysql:
     build: ./mysql # Look for Dockerfile in this path
@@ -27,6 +32,7 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
+<<<<<<< HEAD
       - spring-mysql    # Allow the mysql app to talk to the spring app
 
   python:
@@ -35,6 +41,10 @@ services:
     networks:
       - spring-python
       
+=======
+      - spring-mysql # Allow the mysql app to talk to the spring app
+
+>>>>>>> d8be8dc (fixed file structure for backend, created devcontainers for docker, create simplae route in backend, chnaged from maven to gradle for building and updated dockerfile to work with it.)
   react:
     build: ./react # Look for Dockerfile in this path
     tty: true
@@ -44,6 +54,7 @@ services:
       # Tell the react app that our spring server is running here
       - BACKEND_PROXY=http://spring:8080
     networks:
+<<<<<<< HEAD
       - spring-react    # Allow the react app to discover the spring app
       
   selenium:
@@ -53,6 +64,9 @@ services:
       - "7900:7900"
     networks:
       - spring-python
+=======
+      - spring-react # Allow the react app to discover the spring app
+>>>>>>> d8be8dc (fixed file structure for backend, created devcontainers for docker, create simplae route in backend, chnaged from maven to gradle for building and updated dockerfile to work with it.)
 
 volumes:
   mariadb_data:
