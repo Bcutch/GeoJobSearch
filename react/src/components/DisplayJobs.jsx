@@ -1,15 +1,13 @@
-import React, {useState, useEffect} from "react";
-
+import React, { useState, useEffect } from "react";
 
 const DisplayJobs = () => {
-
   const [jobs, setJobs] = useState([]);
 
-  useEffect (() => {
+  useEffect(() => {
     fetch("http://localhost:8080/jobs")
-      .then(response => response.json())
-      .then(data => setJobs(data))
-      .catch(error => console.error("Error fetching jobs:", error));
+      .then((response) => response.json())
+      .then((data) => setJobs(data))
+      .catch((error) => console.error("Error fetching jobs:", error));
   }, []);
 
   return (
@@ -26,11 +24,7 @@ const DisplayJobs = () => {
             </a>
             <p>Salary: {job.salary}</p>
             <p>Field: {job.field}</p>
-<<<<<<< HEAD
             <p>Remote: {job.is_remote ? "Yes" : "No"}</p>
-=======
-            <p>Remote: {job.is_remote ? 'Yes' : 'No'}</p>
->>>>>>> f2e0a73 (added get request)
             {/* You can add latitude and longitude if needed */}
           </div>
         ))}
