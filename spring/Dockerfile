@@ -1,28 +1,37 @@
-# Stage 1: build
-##  Start with a base image from Eclipse Temurin (a distribution of OpenJDK) with Alpine Linux, specifying it as the build stage and naming it "build".
+# Use Eclipse Temurin 21 (Java 21) as the base image for the build stage
 FROM eclipse-temurin:21-jammy as build
+
+# Set the working directory inside the Docker image
 WORKDIR /workspace/app
 
-## Copy neccessary files for building the java project
-COPY mvnw .
-RUN chmod +x ./mvnw
-COPY .mvn .mvn
-COPY pom.xml .
+# Copy the Gradle wrapper and necessary files
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+
+# Make the Gradle wrapper executable
+RUN chmod +x ./gradlew
+
+# Use the Gradle wrapper to ensure the project is properly set up
+RUN ./gradlew wrapper
+
+# Copy the project source
 COPY src src
 
-## Use Maven to build the application using the RUN stanza
-RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+# At this stage, you can build the project if needed, or prepare for bootRun
+# No explicit build command here, as we will use bootRun to run the application in the final stage
 
-# Stage 2: runtime
-## Start a new stage, using a fresh Alpine-based image from Eclipse Temurin.
+# Use Eclipse Temurin 21 (Java 21) for the runtime stage
 FROM eclipse-temurin:21-jammy
-ARG DEPENDENCY=/workspace/app/target/dependency
 
-## Only copy necessary files
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+WORKDIR /app
 
-## Start the srping app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.example.cis4900.spring.template.TemplateApplication"]
+# Copy the built application or the necessary files from the build stage
+COPY --from=build /workspace/app .
+
+# Expose the port the application runs on
+EXPOSE 8080
+
+# Command to run the application. Adjust if you perform a build and run a JAR file instead
+CMD ["./gradlew", "bootRun"]
