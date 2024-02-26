@@ -1,40 +1,43 @@
 package spring.backend.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-@Entity // This tells Hibernate to make a table out of this class
+@Entity
+@Table(name = "job")
 public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id; // Changed to Integer to match INT type
 
-    @Column(nullable = false)
     private String title;
-
     private String company;
     private String location;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(length = 1023)
     private String url;
 
     private Integer salary;
     private String field;
 
-    @Column(name = "is_remote")
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isRemote = false;
 
+    @Column
     private Double latitude;
+
+    @Column
     private Double longitude;
 
     // Getters
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -79,7 +82,7 @@ public class Job {
     }
 
     // Setters
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
