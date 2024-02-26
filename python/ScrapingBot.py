@@ -3,7 +3,10 @@ import time, json
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+<<<<<<< HEAD
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
+=======
+>>>>>>> 9d74044 (Fixed compose.yml issues)
 time.sleep(60)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 3
@@ -91,6 +94,7 @@ options = webdriver.ChromeOptions()
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Remote(command_executor=serverURL, options=options)
+
 
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
@@ -435,7 +439,7 @@ for element in tempData:
     print(element['title'])
 =======
             href = element.get('href') # Get link that the a is referencing to 
-            # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+            driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -482,9 +486,12 @@ def scrapeLinkedIn(numPages, jobData, driver):
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'html.parser')
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     driver.quit()
 >>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
+=======
+>>>>>>> 9d74044 (Fixed compose.yml issues)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -501,8 +508,15 @@ for element in jobData:
 >>>>>>> 837dca4 (fixed merge conflict)
 =======
 
+<<<<<<< HEAD
 driver.quit()
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> c5734c4 (fixed merge conflict)
 =======
 >>>>>>> 18bde28 (fixed merge conflict)
+=======
+=======
+driver.quit()
+>>>>>>> 9d74044 (Fixed compose.yml issues)
+>>>>>>> 4bfd60b (Fixed compose.yml issues, fixed merge)
