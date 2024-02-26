@@ -1,46 +1,6 @@
 selenium
 beautifulsoup4
 mysql-connector-python
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> fc1483f (.fixed merge conflict)
-=======
->>>>>>> c4dac48 (fixed merge conflict)
-pytest
-<<<<<<< HEAD
->>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
-=======
-pytest
-<<<<<<< HEAD
-requests
-<<<<<<< HEAD
->>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
-=======
-requests
-pytest
-<<<<<<< HEAD
->>>>>>> 87af53c (Fixing merge conflicts)
-=======
-=======
-requests
->>>>>>> 9d74044 (Fixed compose.yml issues)
->>>>>>> a4d5c31 (Fixed compose.yml issues)
-=======
-=======
-pytest
->>>>>>> 837dca4 (fixed merge conflict)
-<<<<<<< HEAD
->>>>>>> fc1483f (.fixed merge conflict)
-=======
-=======
 pytest
 requests
->>>>>>> c5734c4 (fixed merge conflict)
->>>>>>> c4dac48 (fixed merge conflict)
-=======
->>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
+

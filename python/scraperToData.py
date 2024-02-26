@@ -28,19 +28,7 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
     longitude DECIMAL(11,8)
 );""")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> fc1483f (.fixed merge conflict)
 jobDict = ScrapingBot.jobData
-=======
-jobDict = springtemplate.python.ScrapingBot.jobData
-
-jobDict = springtemplate.python.ScrapingBot.jobData
->>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
-=======
->>>>>>> fc1483f (.fixed merge conflict)
 
 for job in jobDict:
     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
