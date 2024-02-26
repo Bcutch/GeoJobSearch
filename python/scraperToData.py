@@ -36,9 +36,7 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
 jobDict = ScrapingBot.jobData
 =======
 jobDict = springtemplate.python.ScrapingBot.jobData
->>>>>>> 837dca4 (fixed merge conflict)
-<<<<<<< HEAD
-=======
+
 jobDict = springtemplate.python.ScrapingBot.jobData
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======

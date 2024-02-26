@@ -35,6 +35,8 @@ services:
     networks:
       - spring-python
 
+      - spring-mysql # Allow the mysql app to talk to the spring app
+
   react:
     build: ./react # Look for Dockerfile in this path
     tty: true
@@ -45,7 +47,6 @@ services:
       - BACKEND_PROXY=http://spring:8080
     networks:
       - spring-react # Allow the react app to discover the spring app
-
   selenium:
     image: selenium/standalone-chrome
     ports:
