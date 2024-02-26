@@ -17,12 +17,16 @@
 
 # imports:
 import pytest                               # testing module
+import mysql.connector                      # sql
 from ...main.python import scraperToData      # scraperToData.py 
 from ...main.python.scraperToData import scraperToDataConnection      # scraperToDataConnection class
 
 # tests:
 # these functions don't have any naming restrictions from pytest
 # they are all named with the prefix 'test' to stay consistent
+
+fakeDataTitle = 'THIS_IS_A_UNIT_TEST_TITLE'     # the title used for fake data when inserting it into the database
+# this is important to know what to remove later
 
 def testImproperHostname():
     improperHostname = "ja,s1f#a sh!/"    # assuming a hostname can't be the same name as this gibberish
@@ -65,7 +69,7 @@ def testAddCorruptData():
 
 def testAddMultipleData():
     data = [{   # this is fake data that will be inserted into the table and also removed
-        'title':'THIS_IS_A_UNIT_TEST_TITLE',
+        'title':fakeDataTitle,
         'url':'THIS_IS_FAKE_DATA'
         }]
     connection = scraperToDataConnection()
@@ -75,21 +79,35 @@ def testAddMultipleData():
     
     connection.cursor.execute(f"""
                               SELECT * FROM {scraperToData.tablename}
-                              WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
+                              WHERE title = '{fakeDataTitle}';
                               """)
     result = connection.cursor.fetchall()
-    connection.cursor.clear_attributes()
+    # cur.get_attributes()
     assert len(result) == 1      # there should not be any duplicate entries but there should be the one that was added
     
     connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
     connection.database.commit()                # clear table of fake data
-    connection.cursor.clear_attributes()
+    
+def testLongUrlLength():
+    string = "a"*1000
+    data = [{   # this is fake data that will be inserted into the table and also removed
+        'title':fakeDataTitle,
+        'url':string
+        }]
+    
+    with pytest.raises(mysql.connector.DataError):
+        connection = scraperToDataConnection()
+        connection.addJobData(data)
+
+    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.database.commit()                # clear table of fake data
+    
     
 # I made this before I realized we wouldn't be accessing the database like this
 # Incase it needs to be implemented its here but I'm assuming we won't need it
 # def testGetData():
 #     data = [{   # this is fake data that will be inserted into the table and also removed
-#         'title':'THIS_IS_A_UNIT_TEST_TITLE',
+#         'title':fakeDataTitle,
 #         'url':'THIS_IS_FAKE_DATA'
 #         }]
 #     connection = scraperToDataConnection()
@@ -106,4 +124,5 @@ def testAddMultipleData():
 
 #     connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
 #     connection.database.commit()                # clear table of fake data
-#     connection.cursor.clear_attributes()
+
+

@@ -1,12 +1,4 @@
 import mysql.connector
-
-# I can't get the local imports to work when running the file directly
-# this works but if there is a better way to do this then please change.
-# - Jacob
-if __name__ == "__main__":      # imports when running file
-    import ScrapingBot          
-else:                           # imports when another file runs this
-    from . import ScrapingBot
     
 # can be tested by running:
 # pytest spring/src/test/python/test_scraperToData.py
@@ -37,7 +29,7 @@ class scraperToDataConnection:
             user:           username of the sql server that will be connected to
             passwd:         password of the sql server that will be connected to
             databaseName:   name of the sql database that will be connected to
-            debugFeedback:  Controls if print statements are displayed, this includes all errors and updates
+            debugFeedback:  If true, print statements that could help debug will be displayed. Defaults to False
         """
         # private variables
         self.__host = host
@@ -128,7 +120,6 @@ class scraperToDataConnection:
             );;""")           # select all tables with the name table name
         # {tablename}
         result = self.cursor.fetchone()[0] == 1  # check if table exists
-        self.cursor.clear_attributes()
         
         if self.debugFeedback: print(f"{self.databaseName} existence={result}")
         
@@ -163,7 +154,6 @@ class scraperToDataConnection:
             latitude DECIMAL(11,8),
             longitude DECIMAL(11,8)
         );""")
-        self.cursor.clear_attributes()
         
     
     def addJobData(self, jobData:list) -> bool:
@@ -173,21 +163,17 @@ class scraperToDataConnection:
         Returns:
             bool: Returns True if added the data successfully
         """
-        try:
-            self.cursor = self.database.cursor()     # init cursor
-            for job in jobData:
-                self.cursor.execute(f"""INSERT IGNORE INTO job 
+        self.cursor = self.database.cursor()     # init cursor
+        for job in jobData:
+            try:
+                self.cursor.execute(f"""INSERT INTO job 
                                     (title, url) VALUES ("{job['title']}", "{job['url']}")
                                     ;""")
                 self.database.commit()  # commit insert to database
-                self.cursor.clear_attributes()
-            
-            return True
-                
-        except Exception as error:
-            if self.debugFeedback: print(error)
-            raise LookupError
-    
+            except mysql.connector.IntegrityError:
+                continue
+        return True
+        
     
 # I made this before I realized we wouldn't be accessing the database like this
 # Incase it needs to be implemented its here but I'm assuming we won't need it
@@ -206,7 +192,6 @@ class scraperToDataConnection:
 #                     SELECT * FROM {tablename}
 #                     """)
 #         jobEntries = self.cursor.fetchall()
-#         self.cursor.clear_attributes()
         
 #         result = []
 #         # convert list of tuples to list of dictionaries
@@ -233,3 +218,11 @@ class scraperToDataConnection:
 # jobData = []
 # ScrapingBot.scrapeLinkedIn(1, jobData)
 # connection.addJobData(jobData)
+
+
+# conn = scraperToDataConnection()
+# conn.cursor.execute(f"""
+#                               SELECT * FROM {tablename}
+#                               WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
+#                               """)
+# result = conn.cursor.fetchall()
