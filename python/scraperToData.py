@@ -28,7 +28,7 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
     longitude DECIMAL(11,8)
 );""")
 
-jobDict = springtemplate.python.ScrapingBot.jobData
+jobDict = ScrapingBot.jobData
 
 for job in jobDict:
     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
