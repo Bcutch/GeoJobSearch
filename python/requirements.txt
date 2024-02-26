@@ -5,6 +5,7 @@ mysql-connector-python
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> fc1483f (.fixed merge conflict)
@@ -41,3 +42,5 @@ pytest
 requests
 >>>>>>> c5734c4 (fixed merge conflict)
 >>>>>>> c4dac48 (fixed merge conflict)
+=======
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)

@@ -146,6 +146,7 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
@@ -162,6 +163,9 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 =======
 
 >>>>>>> c4dac48 (fixed merge conflict)
+=======
+
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -520,6 +524,7 @@ for element in tempData:
             href = element.get('href') # Get link that the a is referencing to 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 =======
             href = element.get('href') # Get link that the a is referencing to 
@@ -541,6 +546,9 @@ for element in tempData:
 =======
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 >>>>>>> c4dac48 (fixed merge conflict)
+=======
+            driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -594,13 +602,17 @@ def scrapeLinkedIn(numPages, jobData, driver):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
+=======
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
 =======
     driver.quit()
 >>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======
 >>>>>>> 9d74044 (Fixed compose.yml issues)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     driver.quit()
@@ -619,6 +631,8 @@ def scrapeLinkedIn(numPages, jobData, driver):
 >>>>>>> fc1483f (.fixed merge conflict)
 =======
 >>>>>>> c4dac48 (fixed merge conflict)
+=======
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -694,6 +708,20 @@ for element in jobData:
 >>>>>>> 837dca4 (fixed merge conflict)
 =======
 
+<<<<<<< HEAD
 driver.quit()
+<<<<<<< HEAD
 >>>>>>> c5734c4 (fixed merge conflict)
 >>>>>>> c4dac48 (fixed merge conflict)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> c5734c4 (fixed merge conflict)
+=======
+>>>>>>> 18bde28 (fixed merge conflict)
+=======
+=======
+driver.quit()
+>>>>>>> 9d74044 (Fixed compose.yml issues)
+>>>>>>> 4bfd60b (Fixed compose.yml issues, fixed merge)
+>>>>>>> 7a59e1e (Fixed compose.yml issues, fixed merge)
