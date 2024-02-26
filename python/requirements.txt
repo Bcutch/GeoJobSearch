@@ -2,9 +2,4 @@ selenium
 beautifulsoup4
 mysql-connector-python
 pytest
-<<<<<<< HEAD
 requests
-pytest
-=======
-requests
->>>>>>> 9d74044 (Fixed compose.yml issues)
