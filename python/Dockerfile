@@ -4,10 +4,14 @@ FROM python:3.9
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 WORKDIR /app
 =======
 WORKDIR /pythonScraper
 >>>>>>> 837dca4 (fixed merge conflict)
+<<<<<<< HEAD
 =======
 WORKDIR /app
 >>>>>>> c5734c4 (fixed merge conflict)
@@ -17,6 +21,8 @@ WORKDIR /pythonScraper
 =======
 WORKDIR /app
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 
 COPY requirements.txt .
 

@@ -1,5 +1,8 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 import time, json
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -79,12 +82,16 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         # Open URL and wait for everything to load
         driver.get(url)
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 import time
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -99,11 +106,14 @@ time.sleep(60)
 =======
 time.sleep(60)
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 1
 SCROLL_PAUSE_TIME = 2.5
 # Empty Array To Store Dictionaries With Job Data
 jobData = []
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 serverURL = "http://selenium:4444/wd/hub"
@@ -113,12 +123,16 @@ serverURL = "http://172.17.0.2:4444/wd/hub"
 =======
 serverURL = "http://selenium:4444/wd/hub"
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
+=======
+serverURL = "http://172.17.0.2:4444/wd/hub"
+>>>>>>> fc1483f (.fixed merge conflict)
 
 options = webdriver.ChromeOptions()
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Remote(command_executor=serverURL, options=options)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -134,6 +148,8 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 =======
 
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -144,9 +160,13 @@ def scrapeIndeed(numPages, jobData, driver):
         driver.get(url)
         driver.implicitly_wait(10)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 837dca4 (fixed merge conflict)
 =======
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
+=======
+>>>>>>> 837dca4 (fixed merge conflict)
+>>>>>>> fc1483f (.fixed merge conflict)
         # Get Dynamic url as page source for beautiufl soup to parse through the website
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
@@ -155,6 +175,9 @@ def scrapeIndeed(numPages, jobData, driver):
         for element in soup.find_all('a', class_="jcs-JobTitle"):
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
             time.sleep(0.5)
             href = element.get('href') # Get link that the a is referencing to 
 <<<<<<< HEAD
@@ -483,6 +506,7 @@ for element in tempData:
     print(element['title'])
 =======
             href = element.get('href') # Get link that the a is referencing to 
+<<<<<<< HEAD
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 =======
             href = element.get('href') # Get link that the a is referencing to 
@@ -498,6 +522,9 @@ for element in tempData:
 =======
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
+=======
+            # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+>>>>>>> fc1483f (.fixed merge conflict)
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -549,6 +576,7 @@ def scrapeLinkedIn(numPages, jobData, driver):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
 =======
@@ -569,6 +597,9 @@ def scrapeLinkedIn(numPages, jobData, driver):
 >>>>>>> 87af53c (Fixing merge conflicts)
 =======
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
+=======
+    driver.quit()
+>>>>>>> fc1483f (.fixed merge conflict)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -576,6 +607,7 @@ def scrapeLinkedIn(numPages, jobData, driver):
         url = element.get('href')
         jobData.append({'title': f'{title}', 'url': f'{url}'}) # add to dictionary
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 scrapeIndeed(scrapedPages, jobData, driver)
@@ -600,12 +632,15 @@ driver.quit()
 >>>>>>> 9d74044 (Fixed compose.yml issues)
 >>>>>>> 4bfd60b (Fixed compose.yml issues, fixed merge)
 =======
+=======
+>>>>>>> fc1483f (.fixed merge conflict)
 print('Scraping Jobs')
 # scrapeIndeed(scrapedPages, jobData, driver)
 scrapeLinkedIn(scrapedPages, jobData, driver)
 print('Succesfully Scraped')
 for element in jobData:
        print(f"{element['title']}: {element['url']}")
+<<<<<<< HEAD
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======
 scrapeIndeed(scrapedPages, jobData, driver)
@@ -626,3 +661,6 @@ driver.quit()
 driver.quit()
 >>>>>>> 9d74044 (Fixed compose.yml issues)
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
+=======
+>>>>>>> 837dca4 (fixed merge conflict)
+>>>>>>> fc1483f (.fixed merge conflict)
