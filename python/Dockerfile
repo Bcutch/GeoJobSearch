@@ -1,6 +1,10 @@
 FROM python:3.9
 
+<<<<<<< HEAD
 WORKDIR /app
+=======
+WORKDIR /pythonScraper
+>>>>>>> 837dca4 (fixed merge conflict)
 
 COPY requirements.txt .
 
