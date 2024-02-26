@@ -4,9 +4,12 @@ mysql-connector-python
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+>>>>>>> c4dac48 (fixed merge conflict)
 pytest
 <<<<<<< HEAD
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
@@ -30,4 +33,11 @@ requests
 =======
 pytest
 >>>>>>> 837dca4 (fixed merge conflict)
+<<<<<<< HEAD
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+=======
+pytest
+requests
+>>>>>>> c5734c4 (fixed merge conflict)
+>>>>>>> c4dac48 (fixed merge conflict)

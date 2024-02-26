@@ -95,6 +95,7 @@ from bs4 import BeautifulSoup
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
 =======
@@ -108,11 +109,15 @@ time.sleep(60)
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
 =======
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+time.sleep(60)
+>>>>>>> c4dac48 (fixed merge conflict)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 1
 SCROLL_PAUSE_TIME = 2.5
 # Empty Array To Store Dictionaries With Job Data
 jobData = []
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -126,12 +131,16 @@ serverURL = "http://selenium:4444/wd/hub"
 =======
 serverURL = "http://172.17.0.2:4444/wd/hub"
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+serverURL = "http://selenium:4444/wd/hub"
+>>>>>>> c4dac48 (fixed merge conflict)
 
 options = webdriver.ChromeOptions()
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Remote(command_executor=serverURL, options=options)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -150,6 +159,9 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
 =======
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+
+>>>>>>> c4dac48 (fixed merge conflict)
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -507,6 +519,7 @@ for element in tempData:
 =======
             href = element.get('href') # Get link that the a is referencing to 
 <<<<<<< HEAD
+<<<<<<< HEAD
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 =======
             href = element.get('href') # Get link that the a is referencing to 
@@ -525,6 +538,9 @@ for element in tempData:
 =======
             # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+            driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+>>>>>>> c4dac48 (fixed merge conflict)
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -577,6 +593,7 @@ def scrapeLinkedIn(numPages, jobData, driver):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a4d5c31 (Fixed compose.yml issues)
 =======
@@ -600,6 +617,8 @@ def scrapeLinkedIn(numPages, jobData, driver):
 =======
     driver.quit()
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+>>>>>>> c4dac48 (fixed merge conflict)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -607,6 +626,7 @@ def scrapeLinkedIn(numPages, jobData, driver):
         url = element.get('href')
         jobData.append({'title': f'{title}', 'url': f'{url}'}) # add to dictionary
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -664,3 +684,16 @@ driver.quit()
 =======
 >>>>>>> 837dca4 (fixed merge conflict)
 >>>>>>> fc1483f (.fixed merge conflict)
+=======
+scrapeIndeed(scrapedPages, jobData, driver)
+# scrapeLinkedIn(scrapedPages, jobData, driver)
+
+for element in jobData:
+       print(f"{element['title']}: {element['url']}")
+<<<<<<< HEAD
+>>>>>>> 837dca4 (fixed merge conflict)
+=======
+
+driver.quit()
+>>>>>>> c5734c4 (fixed merge conflict)
+>>>>>>> c4dac48 (fixed merge conflict)
