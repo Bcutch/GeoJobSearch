@@ -16,7 +16,6 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Remote(command_executor=serverURL, options=options)
 
-
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -33,7 +32,7 @@ def scrapeIndeed(numPages, jobData, driver):
         # Loop to go through each reference tag, and run the driver for that specific link so that you can get the active link
         for element in soup.find_all('a', class_="jcs-JobTitle"):
             href = element.get('href') # Get link that the a is referencing to 
-            driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+            # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -79,6 +78,10 @@ def scrapeLinkedIn(numPages, jobData, driver):
 
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'html.parser')
+<<<<<<< HEAD
+=======
+    driver.quit()
+>>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
