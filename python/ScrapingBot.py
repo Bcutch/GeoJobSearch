@@ -87,6 +87,12 @@ from bs4 import BeautifulSoup
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+# Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
+=======
+>>>>>>> 9d74044 (Fixed compose.yml issues)
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
 time.sleep(60)
 =======
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
@@ -116,6 +122,7 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
@@ -124,6 +131,9 @@ driver = webdriver.Remote(command_executor=serverURL, options=options)
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
 =======
 >>>>>>> 87af53c (Fixing merge conflicts)
+=======
+
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
 def scrapeIndeed(numPages, jobData, driver):
     # Loop for going through each page and getting all 15 jobs information
     for i in range(scrapedPages):
@@ -147,6 +157,7 @@ def scrapeIndeed(numPages, jobData, driver):
 <<<<<<< HEAD
             time.sleep(0.5)
             href = element.get('href') # Get link that the a is referencing to 
+<<<<<<< HEAD
 <<<<<<< HEAD
             driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
             url = driver.current_url # Save the new url that opens as the link for our job title
@@ -484,6 +495,9 @@ for element in tempData:
 =======
             # driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
 >>>>>>> 87af53c (Fixing merge conflicts)
+=======
+            driver.get("https:///ca.indeed.com/" + href) # Launch new driver with dynamic link
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
             url = ("https:///ca.indeed.com/" + href) # Save the new url that opens as the link for our job title
             
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
@@ -534,11 +548,15 @@ def scrapeLinkedIn(numPages, jobData, driver):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
 =======
     driver.quit()
 >>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======
 >>>>>>> 9d74044 (Fixed compose.yml issues)
+<<<<<<< HEAD
 =======
     driver.quit()
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
@@ -549,6 +567,8 @@ def scrapeLinkedIn(numPages, jobData, driver):
     driver.quit()
 >>>>>>> 25c3fff (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 >>>>>>> 87af53c (Fixing merge conflicts)
+=======
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
 
     # Loop to find all reference tags
     for element in soup.find_all('a', class_="base-card__full-link"):
@@ -594,8 +614,15 @@ scrapeIndeed(scrapedPages, jobData, driver)
 for element in jobData:
        print(f"{element['title']}: {element['url']}")
 
+<<<<<<< HEAD
 driver.quit()
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
 =======
 >>>>>>> 87af53c (Fixing merge conflicts)
+=======
+=======
+driver.quit()
+>>>>>>> 9d74044 (Fixed compose.yml issues)
+>>>>>>> a4d5c31 (Fixed compose.yml issues)

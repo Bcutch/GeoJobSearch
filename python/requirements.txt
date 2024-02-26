@@ -9,9 +9,16 @@ pytest
 >>>>>>> 6221bf2 (Python container created and script works for linked in, but when I try to run the container in the dev environment it won't work, only works when i run it as a seperate image)
 =======
 pytest
+<<<<<<< HEAD
 requests
 >>>>>>> f63602f (Created Selenium service so that python container can connect to the standalone chrome browser through the docker environmnet, and got python to scrape linkedIn on the environment)
 =======
 requests
 pytest
+<<<<<<< HEAD
 >>>>>>> 87af53c (Fixing merge conflicts)
+=======
+=======
+requests
+>>>>>>> 9d74044 (Fixed compose.yml issues)
+>>>>>>> a4d5c31 (Fixed compose.yml issues)
