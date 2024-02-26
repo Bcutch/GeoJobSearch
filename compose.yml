@@ -1,9 +1,10 @@
 # List of Services
 services:
   spring:
-    build: ./spring   # Look for Dockerfile in this path
+    build: ./spring # Look for Dockerfile in this path
+    tty: true
     ports:
-      - "8080:8080"   # Expose port 8080
+      - "8080:8080" # Expose port 8080
     environment:
       # These are used in apllication.property to setup DB connection
       - DB_ADDRESS=jdbc:mysql://mysql:3306
@@ -11,12 +12,12 @@ services:
       - DB_USER=root
       - DB_PASSWORD=pwd
     networks:
-      - spring-mysql    # Allow the spring app to discover the mysql app
+      - spring-mysql # Allow the spring app to discover the mysql app
       - spring-react
-      - spring-python    # Allow the spring app to talk to the react app
+      - spring-python # Allow the spring app to talk to the react app
 
   mysql:
-    build: ./mysql    # Look for Dockerfile in this path
+    build: ./mysql # Look for Dockerfile in this path
     ports:
       - "3306:3306"
     environment:
@@ -34,15 +35,18 @@ services:
     networks:
       - spring-python
 
+      - spring-mysql # Allow the mysql app to talk to the spring app
+
   react:
-    build: ./react    # Look for Dockerfile in this path
+    build: ./react # Look for Dockerfile in this path
+    tty: true
     ports:
-      - "3000:3000"   # Expose port 3000
+      - "3000:3000" # Expose port 3000
     environment:
       # Tell the react app that our spring server is running here
       - BACKEND_PROXY=http://spring:8080
     networks:
-      - spring-react    # Allow the react app to discover the spring app
+      - spring-react # Allow the react app to discover the spring app
       
   selenium:
     image: selenium/standalone-chrome
@@ -55,7 +59,7 @@ volumes:
   mariadb_data:
 
 # List of Networks
-networks:               
+networks:
   spring-mysql:
   spring-react:
   spring-python:

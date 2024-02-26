@@ -4,25 +4,9 @@ FROM eclipse-temurin:21-jammy as build
 WORKDIR /workspace/app
 
 ## Copy neccessary files for building the java project
-COPY mvnw .
-RUN chmod +x ./mvnw
-COPY .mvn .mvn
-COPY pom.xml .
+COPY gradlew .
+RUN chmod +x ./gradlew
+COPY gradle ./gradle
+COPY build.gradle .
+RUN ./gradlew wrapper
 COPY src src
-
-## Use Maven to build the application using the RUN stanza
-RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
-
-# Stage 2: runtime
-## Start a new stage, using a fresh Alpine-based image from Eclipse Temurin.
-FROM eclipse-temurin:21-jammy
-ARG DEPENDENCY=/workspace/app/target/dependency
-
-## Only copy necessary files
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-
-## Start the srping app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.example.cis4900.spring.template.TemplateApplication"]
