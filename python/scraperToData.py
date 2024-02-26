@@ -1,14 +1,23 @@
 import mysql.connector
+import ScrapingBot
 
 # I can't get the local imports to work when running the file directly
 # this works but if there is a better way to do this then please change.
 # - Jacob
-if __name__ == "__main__":      # imports when running file
-    import ScrapingBot          
-else:                           # imports when another file runs this
-    from . import ScrapingBot
+# if __name__ == "__main__":      # imports when running file
+#     import ScrapingBot          
+# else:                           # imports when another file runs this
+#     from . import ScrapingBot
 
-db = mysql.connector.connect(host="localhost", user="root", passwd="root", database="testdb")
+
+# Updated database connection details
+db = mysql.connector.connect(
+    host="mysql",  # Updated to the new host
+    user="root",  # DB_USER
+    passwd="pwd",  # DB_PASSWORD
+    database="template_db"  # DB_DATABASE
+)
+
 
 mycursor = db.cursor()
 
@@ -28,9 +37,10 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
     longitude DECIMAL(11,8)
 );""")
 
-jobDict = ScrapingBot.jobData
+jobDict = ScrapingBot.tempData
 
 for job in jobDict:
+    print(job)
     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
     db.commit()
 

@@ -34,6 +34,7 @@ services:
 
     networks:
       - spring-python
+      - spring-mysql
 
   react:
     build: ./react # Look for Dockerfile in this path

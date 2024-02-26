@@ -19,7 +19,7 @@ const DisplayJobs = () => {
             <p>Company: {job.company}</p>
             <p>Location: {job.location}</p>
             <p>Description: {job.description}</p>
-            <a href={job.link} target="_blank" rel="noopener noreferrer">
+            <a href={job.url} target="_blank" rel="noopener noreferrer">
               Apply here
             </a>
             <p>Salary: {job.salary}</p>

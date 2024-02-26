@@ -1,6 +1,6 @@
 FROM python:3.9
 
-WORKDIR /pythonScraper
+WORKDIR /python
 
 COPY requirements.txt .
 
@@ -9,4 +9,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "ScrapingBot.py"]
+CMD python ScrapingBot.py & python scraperToData.py & wait
+
