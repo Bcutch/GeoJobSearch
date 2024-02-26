@@ -28,12 +28,13 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - spring-mysql    # Allow the mysql app to talk to the spring app
-      
+
   python:
     build: ./python
 
     networks:
       - spring-python
+      
   react:
     build: ./react # Look for Dockerfile in this path
     tty: true
@@ -43,7 +44,7 @@ services:
       # Tell the react app that our spring server is running here
       - BACKEND_PROXY=http://spring:8080
     networks:
-      - spring-react # Allow the react app to discover the spring app
+      - spring-react    # Allow the react app to discover the spring app
       
   selenium:
     image: selenium/standalone-chrome
@@ -52,6 +53,7 @@ services:
       - "7900:7900"
     networks:
       - spring-python
+
 volumes:
   mariadb_data:
 
