@@ -5,6 +5,7 @@ mysql-connector-python
 <<<<<<< HEAD
 pytest
 requests
+<<<<<<< HEAD
 =======
 pytest
 >>>>>>> 837dca4 (fixed merge conflict)
@@ -12,3 +13,6 @@ pytest
 pytest
 requests
 >>>>>>> c5734c4 (fixed merge conflict)
+=======
+pytest
+>>>>>>> 18bde28 (fixed merge conflict)

@@ -34,9 +34,6 @@ services:
 
     networks:
       - spring-python
-
-      - spring-mysql # Allow the mysql app to talk to the spring app
-
   react:
     build: ./react # Look for Dockerfile in this path
     tty: true
