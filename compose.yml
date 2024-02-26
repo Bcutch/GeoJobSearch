@@ -53,7 +53,6 @@ services:
       - "7900:7900"
     networks:
       - spring-python
-
 volumes:
   mariadb_data:
 

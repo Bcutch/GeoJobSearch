@@ -1,10 +1,14 @@
 FROM python:3.9
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 WORKDIR /app
 =======
 WORKDIR /pythonScraper
 >>>>>>> 837dca4 (fixed merge conflict)
+=======
+WORKDIR /app
+>>>>>>> c5734c4 (fixed merge conflict)
 
 COPY requirements.txt .
 

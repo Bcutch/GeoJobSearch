@@ -2,8 +2,13 @@ selenium
 beautifulsoup4
 mysql-connector-python
 <<<<<<< HEAD
+<<<<<<< HEAD
 pytest
 requests
 =======
 pytest
 >>>>>>> 837dca4 (fixed merge conflict)
+=======
+pytest
+requests
+>>>>>>> c5734c4 (fixed merge conflict)
