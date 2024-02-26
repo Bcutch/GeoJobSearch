@@ -1,4 +1,5 @@
 import mysql.connector
+import re
     
 # can be tested by running:
 # pytest spring/src/test/python/test_scraperToData.py
@@ -140,7 +141,6 @@ class scraperToDataConnection:
         """
         # had to decrease URL size from 2000 down to 768 to use url's as a
         # unique to to prevent duplicate entries
-        self.cursor = self.database.cursor()     # init cursor          
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS job (
             id INT AUTO_INCREMENT COMMENT 'Primary Key' PRIMARY KEY,
             title VARCHAR(255),
@@ -163,20 +163,53 @@ class scraperToDataConnection:
         Returns:
             bool: Returns True if added the data successfully
         """
-        self.cursor = self.database.cursor()     # init cursor
         for job in jobData:
             try:
-                self.cursor.execute(f"""INSERT INTO job 
-                                    (title, url) VALUES ("{job['title']}", "{job['url']}")
-                                    ;""")
+                # title and url columns must have inforation or error will raise
+                # all other fields can have null values
+                # columns = '(title, company, location, description, url, salary, field, is_remote)'
+                buildString = """INSERT INTO job"""
+                buildString += """ (title, company, location, description, url, salary, field, is_remote)"""
+                buildString += """ VALUES ("""
+                buildString += f""""{job['title']}","""
+                buildString += f""""{job['company']}",""" if 'company' in job else """NULL,"""
+                buildString += f""""{job['location']}",""" if 'location' in job else """NULL,"""
+                buildString += f""""{job['description']}",""" if 'description' in job else """NULL,"""
+                buildString += f""""{job['url']}","""
+                # buildString += f""""{job['salary']}",""" if 'salary' in job else """NULL,"""
+                if 'salary' in job: 
+                    salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])       # uses regex to find all dollar values in string
+                    salary = round(sum(int(val[1:].replace(",","")) for val in salaries)/len(salaries), 2)  # take average and round to 2 decimal places
+                    buildString += f"""{salary},"""
+                else:
+                    buildString += """NULL,"""
+                buildString += f""""{job['field']}",""" if 'field' in job else """NULL,"""
+                buildString += f"""{int(job['remote'])}""" if 'remote' in job else """0"""
+                buildString += """);"""
+                # self.cursor.execute(f"""INSERT INTO job
+                #                     {columns} VALUES (
+                #                     "{job['title']}",
+                #                     {f"{job['company']}"  if 'company' in job else "NULL"}, 
+                #                     {f"{job['location']}" if 'location' in job else "NULL"}, 
+                #                     {f"{job['description']}" if 'description' in job else "NULL"},
+                #                     "{job['url']}", 
+                #                     {f"{job['salary']}" if 'salary' in job else "NULL"}, 
+                #                     {f"{job['field']}" if 'field' in job else "NULL"},
+                #                     {f"{int(job['remote'])}" if 'remote' in job else 0}
+                #                     );""")
+                self.cursor.execute(buildString)
                 self.database.commit()  # commit insert to database
-            except mysql.connector.IntegrityError:
-                continue
+            except mysql.connector.IntegrityError as error:
+                # duplicate entry was attempted if this runs
+                if self.debugFeedback: print(error)
+                if str(error)[:4] != "1062":         # mysql error code 1062 is for duplicate entry attempt in a unique column
+                                                    # if not this error code then error is something else bad and error is re-raised.
+                    raise mysql.connector.IntegrityError(error)
         return True
         
-    
-# I made this before I realized we wouldn't be accessing the database like this
-# Incase it needs to be implemented its here but I'm assuming we won't need it
+
+# # I made this before I realized we wouldn't be accessing the database like this
+# # Incase it needs to be implemented its here but I'm assuming we won't need it
 #     def getData(self, tablename:str=tablename) -> list:
 #         """ Returns all of the table data as a list of dictionaries in the mysql table
 
@@ -226,3 +259,25 @@ class scraperToDataConnection:
 #                               WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
 #                               """)
 # result = conn.cursor.fetchall()
+
+
+
+# data = [{   # this is fake data that will be inserted into the table and also removed
+#     'title':"THIS_IS_A_UNIT_TEST_TITLE",
+#     'url':'THIS_IS_FAKE_DATA'
+#     }]
+# connection = scraperToDataConnection()
+# connection.addJobData(data)     # we will add this same data multiple times to check for duplicates
+# connection.addJobData(data)
+# connection.addJobData(data)
+
+# connection.cursor.execute("""
+#                             SELECT * FROM job
+#                             WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
+#                             """)
+# result = connection.cursor.fetchall()
+
+
+# strings = ["$78,000–$80,000 a year", "$102,185–$122,622 a year", "Up to $90,000 a year"]
+
+# print(re.findall('[\$\£\€][,\d]+\.?\d*',strings[0])[0][1:].replace(",",""))
