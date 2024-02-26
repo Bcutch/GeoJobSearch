@@ -11,6 +11,7 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
+
 # Make the Gradle wrapper executable
 RUN chmod +x ./gradlew
 
