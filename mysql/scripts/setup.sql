@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS job
     company VARCHAR(255) ,
     location VARCHAR(255) ,
     description TEXT ,
-    url VARCHAR(768) UNIQUE,         -- was: url VARCHAR(1023) , changed to prevent duplicate url's
+    url VARCHAR(1023),         -- was: url VARCHAR(768) UNIQUE, changed back because links larger than 768 were found
     salary INT ,
     field VARCHAR(255) ,
     is_remote BOOLEAN  DEFAULT FALSE,

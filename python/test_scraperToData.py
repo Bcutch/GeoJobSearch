@@ -18,8 +18,8 @@
 # imports:
 import pytest                               # testing module
 import mysql.connector                      # sql
-from ..python import scraperToData      # scraperToData.py 
-from ..python.scraperToData import scraperToDataConnection      # scraperToDataConnection class
+import scraperToData      # scraperToData.py 
+from scraperToData import scraperToDataConnection      # scraperToDataConnection class
 
 # tests:
 # these functions don't have any naming restrictions from pytest
@@ -97,7 +97,7 @@ def testAddMultipleData():
     connection.database.commit()                # clear table of fake data
     
 def testLongUrlLength():
-    string = "a"*1000
+    string = "a"*2000
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':string

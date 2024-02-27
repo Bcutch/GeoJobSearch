@@ -2,14 +2,18 @@ import mysql.connector
 import re
     
 # can be tested by running:
-# pytest spring/src/test/python/test_scraperToData.py
+# pytest python/test_scraperToData.py
 
 
 host = "mysql"                  # was "host"
 user = "root"                   # was "root"
 passwd = "pwd"                  # was "root"
-databaseName = "template_db"    # was testdb
-tablename = "job"
+databaseName = "template_db"    # was "testdb"
+# host = "localhost"
+# user = "root"
+# passwd = "root"
+# databaseName = "testdb"
+# tablename = "job"
 
 
 class scraperToDataConnection:
