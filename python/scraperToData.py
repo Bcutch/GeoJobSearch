@@ -159,46 +159,44 @@ class scraperToDataConnection:
         
     
     def addJobData(self, jobData:list) -> bool:
-        """ Adds data from a list in the format: [{dict}, {dict}, {dict}...]. 
-        Adds this data to the job sql table
+        """Adds data from a list in the format: [{dict}, {dict}, {dict}...]. 
+    Adds this data to the job sql table
 
-        Returns:
-            bool: Returns True if added the data successfully
-        """
+    Returns:
+        bool: Returns True if added the data successfully
+    """
         for job in jobData:
             try:
-                # title and url columns must have inforation or error will raise
-                # all other fields can have null values
-                buildString = """INSERT INTO job"""
-                buildString += """ (title, company, location, description, url, salary, field, is_remote)"""
-                buildString += """ VALUES ("""
-                buildString += f""""{job['title']}","""
-                buildString += f""""{job['company']}",""" if 'company' in job else """NULL,"""
-                buildString += f""""{job['location']}",""" if 'location' in job else """NULL,"""
-                buildString += f""""{job['description']}",""" if 'description' in job else """NULL,"""
-                buildString += f""""{job['url']}","""
-
-                salaryString = """NULL,"""
-                if 'salary' in job: 
-                    salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])       # uses regex to find all dollar values in string
-                    if len(salaries) > 0: 
-                        salary = round(sum(int(val[1:].replace(",","")) for val in salaries)/len(salaries), 2)  # take average and round to 2 decimal places
-                        salaryString = f"""{salary},"""
-    
-                buildString += salaryString
-                buildString += f""""{job['field']}",""" if 'field' in job else """NULL,"""
-                buildString += f"""{int(job['remote'])}""" if 'remote' in job else """0"""
-                buildString += """);"""
-                
-                self.cursor.execute(buildString)
-                self.database.commit()  # commit insert to database
+                query = """INSERT INTO job
+                           (title, company, location, description, url, salary, field, is_remote)
+                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"""
+                values = [
+                    job.get('title', None),
+                    job.get('company', None),
+                    job.get('location', None),
+                    job.get('description', None),
+                    job.get('url', None),
+                    None,  # Placeholder for salary, will be calculated below
+                    job.get('field', None),
+                    int(job['remote']) if 'remote' in job else 0
+                ]
+            
+                # Calculate and set salary
+                if 'salary' in job and isinstance(job['salary'], str):
+                    salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])
+                    if len(salaries) > 0:
+                        salary = round(sum(int(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
+                        values[5] = salary  # Set calculated salary
+            
+                self.cursor.execute(query, tuple(values))
+                self.database.commit()
             except mysql.connector.IntegrityError as error:
-                # duplicate entry was attempted if this runs
                 if self.debugFeedback: print(error)
-                if str(error)[:4] != "1062":         # mysql error code 1062 is for duplicate entry attempt in a unique column
-                                                    # if not this error code then error is something else bad and error is re-raised.
-                    raise mysql.connector.IntegrityError(error)
+                if str(error)[:4] != "1062":
+                    raise
+
         return True
+
         
 
 # # I made this before I realized we wouldn't be accessing the database like this
