@@ -18,8 +18,8 @@
 # imports:
 import pytest                               # testing module
 import mysql.connector                      # sql
-from ...main.python import scraperToData      # scraperToData.py 
-from ...main.python.scraperToData import scraperToDataConnection      # scraperToDataConnection class
+from .....python import scraperToData      # scraperToData.py 
+from .....python.scraperToData import scraperToDataConnection      # scraperToDataConnection class
 
 # tests:
 # these functions don't have any naming restrictions from pytest
