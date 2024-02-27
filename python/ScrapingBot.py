@@ -1,5 +1,6 @@
 import time, json
 from selenium import webdriver
+from scraperToData import scraperToDataConnection
 import mysql.connector
 from bs4 import BeautifulSoup
 
@@ -75,8 +76,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         # Open URL and wait for everything to load
         driver.get(url)
         # Get Dynamic url as page source for beautiufl soup to parse through the website
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         # Loop to go through each reference tag, and run the driver for that specific link so that you can get the active link
         for element in soup.find_all('a', class_="jcs-JobTitle"):
@@ -406,42 +406,46 @@ scrapeIndeed(1, jobDict, jobLimit=10)
 for element in jobDict:
     print(element['title'])
 
-    db = mysql.connector.connect(
-    host="mysql",  # Updated to the new host
-    user="root",  # DB_USER
-    passwd="pwd",  # DB_PASSWORD
-    database="template_db"  # DB_DATABASE
-)
+    # db = mysql.connector.connect(
+host="mysql",  # Updated to the new host
+user="root",  # DB_USER
+passwd="pwd",  # DB_PASSWORD
+database="template_db"  # DB_DATABASE
+# )
+print('Entering Job Data...')
+
+connection = scraperToDataConnection(host=host, user=user, passwd=passwd, databaseName=database)
+connection.addJobData(jobDict)
+
+print('Job Data Entered')
+# mycursor = db.cursor()
+
+# # mycursor.execute("DROP TABLE job")
+
+# print('Creating Table')
+
+# mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
+#     id INT AUTO_INCREMENT COMMENT 'Primary Key' PRIMARY KEY,
+#     title VARCHAR(255) NOT NULL,
+#     company VARCHAR(255),
+#     location VARCHAR(255),
+#     description TEXT,
+#     url VARCHAR(2000) NOT NULL,
+#     salary INT,
+#     field VARCHAR(255),
+#     is_remote BOOLEAN NOT NULL DEFAULT FALSE,
+#     latitude DECIMAL(11,8),
+#     longitude DECIMAL(11,8)
+# );""")
+
+# print('table Created')
 
 
-mycursor = db.cursor()
+# for job in jobDict:
+#     print(job)
+#     mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
+#     db.commit()
 
-# mycursor.execute("DROP TABLE job")
-
-print('Creating Table')
-
-mycursor.execute("""CREATE TABLE IF NOT EXISTS job (
-    id INT AUTO_INCREMENT COMMENT 'Primary Key' PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    company VARCHAR(255),
-    location VARCHAR(255),
-    description TEXT,
-    url VARCHAR(2000) NOT NULL,
-    salary INT,
-    field VARCHAR(255),
-    is_remote BOOLEAN NOT NULL DEFAULT FALSE,
-    latitude DECIMAL(11,8),
-    longitude DECIMAL(11,8)
-);""")
-
-print('table Created')
-
-
-for job in jobDict:
-    print(job)
-    mycursor.execute("""INSERT INTO job (title, url) VALUES ("%s", "%s");""" % (job['title'], job['url']))
-    db.commit()
-
-db.close()
+# db.close()
 
 

@@ -3,4 +3,3 @@ beautifulsoup4
 mysql-connector-python
 pytest
 requests
-
