@@ -18,7 +18,7 @@
 
 # imports:
 import pytest                               # testing module
-from .....python import ScrapingBot      # ScrapingBot.py 
+from ..python import ScrapingBot      # ScrapingBot.py 
 
 
 # tests:

@@ -5,15 +5,10 @@ import re
 # pytest spring/src/test/python/test_scraperToData.py
 
 
-# TODO: when the database is created, change the variable names to the new ones
-# or remove them from from the __init__ line as default variables and pass as parameters manually
-host = "localhost"
-# host = 'jdbc:mysql://mysql:3306'
-user = "root"
-passwd = "root"
-# passwd = 'pwd'
-databaseName = "testdb"
-# databaseName = 'template_db'
+host = "mysql"                  # was "host"
+user = "root"                   # was "root"
+passwd = "pwd"                  # was "root"
+databaseName = "template_db"    # was testdb
 tablename = "job"
 
 
