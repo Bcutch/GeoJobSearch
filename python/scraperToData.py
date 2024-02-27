@@ -13,12 +13,12 @@ databaseName = "template_db"    # was "testdb"
 # user = "root"
 # passwd = "root"
 # databaseName = "testdb"
-# tablename = "job"
+tablename = "job"
 
 
 class scraperToDataConnection:
     def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
-                 debugFeedback:bool=False) -> None:
+                 dropTable:bool=False, debugFeedback:bool=False) -> None:
         """ Summary:
             Creates a connection within the class for a continous connection to the database.
             The connection will automatically close when the class is terminated at the end of a program.
@@ -30,7 +30,8 @@ class scraperToDataConnection:
             user:           username of the sql server that will be connected to
             passwd:         password of the sql server that will be connected to
             databaseName:   name of the sql database that will be connected to
-            debugFeedback:  If true, print statements that could help debug will be displayed. Defaults to False
+            resetTable:     WARNING: If True, will drop the current contents of the table. Defaults to False
+            debugFeedback:  If True, print statements that could help debug will be displayed. Defaults to False
         """
         # private variables
         self.__host = host
@@ -40,13 +41,14 @@ class scraperToDataConnection:
         self.databaseName = databaseName
         self.tablename = tablename
         self.debugFeedback = debugFeedback
+        self.dropTable = dropTable
         
         # create database connection
         self.database = self.__connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
         self.cursor = self.database.cursor()     # init cursor
         
         # create table if not exists
-        # if self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
+        if self.dropTable and self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
         self.createJobTable()
         
         
