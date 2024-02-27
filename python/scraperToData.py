@@ -101,10 +101,10 @@ class scraperToDataConnection:
             bool: True if sql database was successfully connected, False if not connected
         """
         try:
-            database = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
+            conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             
             if self.debugFeedback: print(f"Database: {self.databaseName} successfully connected")
-            return database
+            return conn
         
         except Exception as error:
             if self.debugFeedback: print(error)
