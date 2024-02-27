@@ -75,8 +75,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         # Open URL and wait for everything to load
         driver.get(url)
         # Get Dynamic url as page source for beautiufl soup to parse through the website
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         # Loop to go through each reference tag, and run the driver for that specific link so that you can get the active link
         for element in soup.find_all('a', class_="jcs-JobTitle"):
