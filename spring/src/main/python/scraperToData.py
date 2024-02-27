@@ -16,6 +16,7 @@ databaseName = "testdb"
 # databaseName = 'template_db'
 tablename = "job"
 
+
 class scraperToDataConnection:
     def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
                  debugFeedback:bool=False) -> None:
@@ -167,7 +168,6 @@ class scraperToDataConnection:
             try:
                 # title and url columns must have inforation or error will raise
                 # all other fields can have null values
-                # columns = '(title, company, location, description, url, salary, field, is_remote)'
                 buildString = """INSERT INTO job"""
                 buildString += """ (title, company, location, description, url, salary, field, is_remote)"""
                 buildString += """ VALUES ("""
@@ -176,27 +176,19 @@ class scraperToDataConnection:
                 buildString += f""""{job['location']}",""" if 'location' in job else """NULL,"""
                 buildString += f""""{job['description']}",""" if 'description' in job else """NULL,"""
                 buildString += f""""{job['url']}","""
-                # buildString += f""""{job['salary']}",""" if 'salary' in job else """NULL,"""
+
+                salaryString = """NULL,"""
                 if 'salary' in job: 
                     salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])       # uses regex to find all dollar values in string
-                    salary = round(sum(int(val[1:].replace(",","")) for val in salaries)/len(salaries), 2)  # take average and round to 2 decimal places
-                    buildString += f"""{salary},"""
-                else:
-                    buildString += """NULL,"""
+                    if len(salaries) > 0: 
+                        salary = round(sum(int(val[1:].replace(",","")) for val in salaries)/len(salaries), 2)  # take average and round to 2 decimal places
+                        salaryString = f"""{salary},"""
+    
+                buildString += salaryString
                 buildString += f""""{job['field']}",""" if 'field' in job else """NULL,"""
                 buildString += f"""{int(job['remote'])}""" if 'remote' in job else """0"""
                 buildString += """);"""
-                # self.cursor.execute(f"""INSERT INTO job
-                #                     {columns} VALUES (
-                #                     "{job['title']}",
-                #                     {f"{job['company']}"  if 'company' in job else "NULL"}, 
-                #                     {f"{job['location']}" if 'location' in job else "NULL"}, 
-                #                     {f"{job['description']}" if 'description' in job else "NULL"},
-                #                     "{job['url']}", 
-                #                     {f"{job['salary']}" if 'salary' in job else "NULL"}, 
-                #                     {f"{job['field']}" if 'field' in job else "NULL"},
-                #                     {f"{int(job['remote'])}" if 'remote' in job else 0}
-                #                     );""")
+                
                 self.cursor.execute(buildString)
                 self.database.commit()  # commit insert to database
             except mysql.connector.IntegrityError as error:
@@ -252,32 +244,3 @@ class scraperToDataConnection:
 # ScrapingBot.scrapeLinkedIn(1, jobData)
 # connection.addJobData(jobData)
 
-
-# conn = scraperToDataConnection()
-# conn.cursor.execute(f"""
-#                               SELECT * FROM {tablename}
-#                               WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
-#                               """)
-# result = conn.cursor.fetchall()
-
-
-
-# data = [{   # this is fake data that will be inserted into the table and also removed
-#     'title':"THIS_IS_A_UNIT_TEST_TITLE",
-#     'url':'THIS_IS_FAKE_DATA'
-#     }]
-# connection = scraperToDataConnection()
-# connection.addJobData(data)     # we will add this same data multiple times to check for duplicates
-# connection.addJobData(data)
-# connection.addJobData(data)
-
-# connection.cursor.execute("""
-#                             SELECT * FROM job
-#                             WHERE title = 'THIS_IS_A_UNIT_TEST_TITLE';
-#                             """)
-# result = connection.cursor.fetchall()
-
-
-# strings = ["$78,000–$80,000 a year", "$102,185–$122,622 a year", "Up to $90,000 a year"]
-
-# print(re.findall('[\$\£\€][,\d]+\.?\d*',strings[0])[0][1:].replace(",",""))

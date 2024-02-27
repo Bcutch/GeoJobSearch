@@ -197,6 +197,47 @@ def testHandleExtraData():
     connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{extraData[0]['title']}'""")    
     connection.database.commit()                # clear table of fake data
     
+def testAddCorrectSalary():
+    # should add the correct salary value from the string
+    data = [{   # this is fake data that will be inserted into the table and also removed
+        'title':fakeDataTitle,
+        'url':'THIS_IS_FAKE_DATA',
+        'salary': 'around $150,000 per year'
+        }]
+    connection = scraperToDataConnection()
+    connection.addJobData(data)            # should raise no errors
+    
+    connection.cursor.execute(f"""
+                              SELECT * FROM {scraperToData.tablename}
+                              WHERE title = '{fakeDataTitle}';
+                              """)
+    result = connection.cursor.fetchall()
+    assert 150_000 in result[0]
+    
+    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.database.commit()                # clear table of fake data
+    
+
+def testAddCorruptSalary():
+    # should add the correct salary value from the string
+    data = [{   # this is fake data that will be inserted into the table and also removed
+        'title':fakeDataTitle,
+        'url':'THIS_IS_FAKE_DATA',
+        'salary': 'nothing'
+        }]
+    connection = scraperToDataConnection()
+    connection.addJobData(data)            # should raise no errors
+    
+    connection.cursor.execute(f"""
+                              SELECT * FROM {scraperToData.tablename}
+                              WHERE title = '{fakeDataTitle}';
+                              """)
+    result = connection.cursor.fetchall()
+    assert 'nothing' not in result[0]
+    
+    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.database.commit()                # clear table of fake data
+    
     
 # I made this before I realized we wouldn't be accessing the database like this
 # Incase it needs to be implemented its here but I'm assuming we won't need it
