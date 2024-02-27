@@ -9,5 +9,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD python ScrapingBot.py & python scraperToData.py & wait
+CMD python ScrapingBot.py
 
