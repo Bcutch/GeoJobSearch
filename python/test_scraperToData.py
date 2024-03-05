@@ -5,20 +5,14 @@
 
 # how to test:
 # --------------------------------------------------------
-# cd to zenithProject directory
-# type into the terminal: python -m pytest
-# this will run all of the pytests in the project at once
-# OPTIONAL: could also test by typing: python -m pytest --cov
-#           this gives a much more in depth result with coverage
+# can be tested by running:
+# pytest python/test_scraperToData.py
 # --------------------------------------------------------
-# requirements:
-# pip install pytest
-# OPTIONAL: pip install pytest-cov
+
 
 # imports:
 import pytest                               # testing module
 import mysql.connector                      # sql
-import scraperToData      # scraperToData.py 
 from scraperToData import scraperToDataConnection      # scraperToDataConnection class
 
 # tests:
@@ -59,7 +53,7 @@ def testGetDatabaseName():
 def testTableCreated():
     connection = scraperToDataConnection()
     connection.createJobTable()
-    assert connection.tableExists(f'{scraperToData.tablename}') == True        # tablename should exist 
+    assert connection.tableExists(f'{connection.tablename}') == True        # tablename should exist 
     
 def testAddCorruptData():
     badData = [{'THIS':'IS A TEST'}]
@@ -87,14 +81,14 @@ def testAddMultipleData():
     connection.addJobData(data)
     
     connection.cursor.execute(f"""
-                              SELECT * FROM {scraperToData.tablename}
+                              SELECT * FROM {connection.tablename}
                               WHERE title = '{fakeDataTitle}';
                               """)
     result = connection.cursor.fetchall()
     assert len(result) == 1      # there should not be any duplicate entries but there should be the one that was added
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
 def testLongUrlLength():
     string = "a"*2000
@@ -107,8 +101,8 @@ def testLongUrlLength():
     with pytest.raises(mysql.connector.DataError):
         connection.addJobData(data)                 # should not be able to add a value longer than the allowed length
 
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
 def testNoTitle(): # title value MUST exist, if not an error should be raised
     data = [{   # this is fake data that will be inserted into the table and also removed
@@ -119,8 +113,8 @@ def testNoTitle(): # title value MUST exist, if not an error should be raised
     with pytest.raises(KeyError):
         connection.addJobData(data)
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE url='{data[0]['url']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE url='{data[0]['url']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
     
 def testNoURL(): # url value MUST exist, if not an error should be raised
@@ -132,8 +126,8 @@ def testNoURL(): # url value MUST exist, if not an error should be raised
     with pytest.raises(KeyError):
         connection.addJobData(data)
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
 
 def testEmptyData():
     emptyData = []
@@ -143,15 +137,15 @@ def testEmptyData():
     connection.addJobData(emptyData)
     
     connection.cursor.execute(f"""
-                              SELECT * FROM {scraperToData.tablename}
+                              SELECT * FROM {connection.tablename}
                               WHERE title = '{fakeDataTitle}';
                               """)
     result = connection.cursor.fetchall()
     assert len(result) == 0      # there should not be any entries
     
     if len(result) > 0:
-        connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{emptyData[0]['title']}'""")    
-        connection.database.commit()                # clear table of fake data
+        connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{emptyData[0]['title']}'""")    
+        connection.databaseConnection.commit()                # clear table of fake data
     
     
 def testAddWrongRemoteValue():
@@ -165,8 +159,8 @@ def testAddWrongRemoteValue():
     with pytest.raises(ValueError):
         connection.addJobData(remoteData)
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{remoteData[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{remoteData[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
 
 def testAddCorrectRemoteValue():
     # remoteness should add correctly
@@ -179,8 +173,8 @@ def testAddCorrectRemoteValue():
     connection = scraperToDataConnection()
     connection.addJobData(remoteData)
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{remoteData[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{remoteData[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
 def testHandleExtraData():
     # should not add or try to add extra data if there is in the dictionary
@@ -194,8 +188,8 @@ def testHandleExtraData():
     connection = scraperToDataConnection()
     connection.addJobData(extraData)            # should raise no errors
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{extraData[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{extraData[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
 def testAddCorrectSalary():
     # should add the correct salary value from the string
@@ -208,15 +202,34 @@ def testAddCorrectSalary():
     connection.addJobData(data)            # should raise no errors
     
     connection.cursor.execute(f"""
-                              SELECT * FROM {scraperToData.tablename}
+                              SELECT * FROM {connection.tablename}
                               WHERE title = '{fakeDataTitle}';
                               """)
     result = connection.cursor.fetchall()
     assert 150_000 in result[0]
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
+def testAddNumericSalary():
+    # should add the correct salary value from the string
+    data = [{   # this is fake data that will be inserted into the table and also removed
+        'title':fakeDataTitle,
+        'url':'THIS_IS_FAKE_DATA',
+        'salary': 150_000
+        }]
+    connection = scraperToDataConnection()
+    connection.addJobData(data)            # should raise no errors
+    
+    connection.cursor.execute(f"""
+                              SELECT * FROM {connection.tablename}
+                              WHERE title = '{fakeDataTitle}';
+                              """)
+    result = connection.cursor.fetchall()
+    assert 'nothing' not in result[0]
+    
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
 
 def testAddCorruptSalary():
     # should add the correct salary value from the string
@@ -229,14 +242,14 @@ def testAddCorruptSalary():
     connection.addJobData(data)            # should raise no errors
     
     connection.cursor.execute(f"""
-                              SELECT * FROM {scraperToData.tablename}
+                              SELECT * FROM {connection.tablename}
                               WHERE title = '{fakeDataTitle}';
                               """)
     result = connection.cursor.fetchall()
     assert 'nothing' not in result[0]
     
-    connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.database.commit()                # clear table of fake data
+    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+    connection.databaseConnection.commit()                # clear table of fake data
     
     
 # I made this before I realized we wouldn't be accessing the database like this
@@ -258,7 +271,7 @@ def testAddCorruptSalary():
 
 
 
-#     connection.cursor.execute(f"""DELETE FROM {scraperToData.tablename} WHERE title='{data[0]['title']}'""")    
-#     connection.database.commit()                # clear table of fake data
+#     connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+#     connection.databaseConnection.commit()                # clear table of fake data
 
 

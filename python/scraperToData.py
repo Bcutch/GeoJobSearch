@@ -1,5 +1,7 @@
 import mysql.connector
 import re
+import os
+from pathlib import Path
     
 # can be tested by running:
 # pytest python/test_scraperToData.py
@@ -44,8 +46,8 @@ class scraperToDataConnection:
         self.dropTable = dropTable
         
         # create database connection
-        self.database = self.__connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
-        self.cursor = self.database.cursor()     # init cursor
+        self.databaseConnection = self.__connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
+        self.cursor = self.databaseConnection.cursor()     # init cursor
         
         # create table if not exists
         if self.dropTable and self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
@@ -62,7 +64,7 @@ class scraperToDataConnection:
         try:
             self.cursor.close()
             if self.debugFeedback: print(f"Cursor closed Successfully.")
-            self.database.close()
+            self.databaseConnection.close()
             if self.debugFeedback: print(f"Database: {self.databaseName} closed Successfully.")
             return True
         except Exception as error:
@@ -82,8 +84,8 @@ class scraperToDataConnection:
         buildString += f"\tdatabasename: {self.databaseName}\n"
         buildString += f"\tdebugFeedback: {self.debugFeedback}\n"
         buildString += "Summary:\n"
-        if self.database != None: 
-            buildString += f"Connected to Database: {self.databaseName}: {self.database.is_connected()}\n"
+        if self.databaseConnection != None: 
+            buildString += f"Connected to Database: {self.databaseName}: {self.databaseConnection.is_connected()}\n"
         else:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
         return buildString
@@ -149,7 +151,7 @@ class scraperToDataConnection:
             company VARCHAR(255),
             location VARCHAR(255),
             description TEXT,
-            url VARCHAR(768) UNIQUE,                   
+            url VARCHAR(2083),                 
             salary INT,
             field VARCHAR(255),
             is_remote BOOLEAN  DEFAULT FALSE,
@@ -171,11 +173,11 @@ class scraperToDataConnection:
                            (title, company, location, description, url, salary, field, is_remote)
                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"""
                 values = [
-                    job.get('title', None),
+                    job['title'],           # was job.get('title', None)        changed so that an error is thrown if no title is found
                     job.get('company', None),
                     job.get('location', None),
                     job.get('description', None),
-                    job.get('url', None),
+                    job['url'],             # was job.get('url', None)        changed so that an error is thrown if no title is found
                     None,  # Placeholder for salary, will be calculated below
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0
@@ -189,7 +191,7 @@ class scraperToDataConnection:
                         values[5] = salary  # Set calculated salary
             
                 self.cursor.execute(query, tuple(values))
-                self.database.commit()
+                self.databaseConnection.commit()
             except mysql.connector.IntegrityError as error:
                 if self.debugFeedback: print(error)
                 if str(error)[:4] != "1062":
@@ -243,3 +245,8 @@ class scraperToDataConnection:
 # ScrapingBot.scrapeLinkedIn(1, jobData)
 # connection.addJobData(jobData)
 
+
+# sqlSetup = os.path.relpath('mysql\\scripts\\setup.sql')
+# with open(sqlSetup, 'r') as sqlFile:
+#     fileContents = sqlFile.read()
+# print(fileContents)
