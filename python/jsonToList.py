@@ -8,7 +8,7 @@ import json
 
 def getSavedJobListings() -> list:
     """ converts json joblistings to list
-git 
+    
     Returns:
         list: list of dictionary containing job listing data
     """
