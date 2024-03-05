@@ -70,7 +70,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        driver = webdriver.Remote(ommand_executor=serverURL, options=options)
+        driver = webdriver.Remote(command_executor=serverURL, options=options)
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
         # Open URL and wait for everything to load
@@ -326,7 +326,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Remote(command_executor=serverURL,  options=options) 
+    driver = webdriver.Remote(command_executor=serverURL, options=options) 
 
     driver.implicitly_wait(10)
     driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
