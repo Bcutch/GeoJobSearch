@@ -10,6 +10,9 @@
 # or for coverage reports:
 # pytest python/test_scrapingBot.py --cov
 # --------------------------------------------------------
+# requirements:
+# pip install pytest
+# pip install pytest-cov
 
 
 
