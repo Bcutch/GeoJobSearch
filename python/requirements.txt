@@ -2,4 +2,5 @@ selenium
 beautifulsoup4
 mysql-connector-python
 pytest
+pytest-cov
 requests

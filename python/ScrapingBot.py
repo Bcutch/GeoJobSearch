@@ -1,11 +1,11 @@
 import time, json
 from selenium import webdriver
-from scraperToData import scraperToDataConnection
+# from scraperToData import scraperToDataConnection
 import mysql.connector
 from bs4 import BeautifulSoup
 
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
-time.sleep(60)
+# time.sleep(60)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 3
 SCROLL_PAUSE_TIME = 2.5
@@ -70,7 +70,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        driver = webdriver.Remote(command_executor=serverURL, options=options)
+        driver = webdriver.Chrome(options=options) # .Remote( # command_executor=serverURL
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
         # Open URL and wait for everything to load
@@ -326,7 +326,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Remote(command_executor=serverURL, options=options)
+    driver = webdriver.Chrome(options=options) # .Remote # command_executor=serverURL, 
 
     driver.implicitly_wait(10)
     driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
@@ -400,11 +400,11 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     finally:
         driver.quit()
 
-jobDict = []
-scrapeIndeed(1, jobDict, jobLimit=10)
+# jobDict = []
+# scrapeIndeed(1, jobDict, jobLimit=10)
 
-for element in jobDict:
-    print(element['title'])
+# for element in jobDict:
+#     print(element['title'])
 
 #     # db = mysql.connector.connect(
 # host="mysql",  # Updated to the new host
@@ -414,11 +414,11 @@ for element in jobDict:
 # # )
 # print('Entering Job Data...')
 
-connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
-print("connected to db")
-connection.addJobData(jobDict)
+# connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
+# print("connected to db")
+# connection.addJobData(jobDict)
 
-print('Job Data Entered')
+# print('Job Data Entered')
 # mycursor = db.cursor()
 
 # # mycursor.execute("DROP TABLE job")
