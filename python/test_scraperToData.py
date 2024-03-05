@@ -7,6 +7,8 @@
 # --------------------------------------------------------
 # can be tested by running:
 # pytest python/test_scraperToData.py
+# or for coverage reports:
+# pytest python/test_scraperToData.py --cov
 # --------------------------------------------------------
 
 

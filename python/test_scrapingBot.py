@@ -5,20 +5,20 @@
 
 # how to test:
 # --------------------------------------------------------
-# cd to zenithProject directory
-# type into the terminal: python -m pytest
-# this will run all of the pytests in the project at once
-# could also test by typing: python -m pytest --cov
-# this gives a much more in depth result with coverage
+# can be tested by running:
+# pytest python/test_scrapingBot.py
+# or for coverage reports:
+# pytest python/test_scrapingBot.py --cov
 # --------------------------------------------------------
 # requirements:
 # pip install pytest
-# OPTIONAL: pip install pytest-cov
+# pip install pytest-cov
+
 
 
 # imports:
 import pytest                               # testing module
-from ..python import ScrapingBot      # ScrapingBot.py 
+import ScrapingBot      # ScrapingBot.py 
 
 
 # tests:
@@ -36,11 +36,9 @@ def testIndeedScraperWorks() -> None:
 
 def testIndeedScraperNoPages() -> None:
     indeedData = []
-    ScrapingBot.scrapeIndeed(0, indeedData)
+    with pytest.raises(ValueError):
+        ScrapingBot.scrapeIndeed(0, indeedData)
 
-    for entry in indeedData:
-        assert (len(entry["title"])) == 0
-        assert (len(entry["url"])) == 0
 
 def testLinkedInScraperWorks() -> None:
     # test that indeed scraper populates jobData
@@ -53,8 +51,7 @@ def testLinkedInScraperWorks() -> None:
 
 def testLinkedInScraperNoPages() -> None:
     linkedInData = []
-    ScrapingBot.scrapeIndeed(0, linkedInData)
+    
+    with pytest.raises(ValueError):
+        ScrapingBot.scrapeIndeed(0, linkedInData)
 
-    for entry in linkedInData:
-        assert (len(entry["title"])) == 0
-        assert (len(entry["url"])) == 0
