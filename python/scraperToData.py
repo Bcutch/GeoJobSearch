@@ -7,14 +7,14 @@ from pathlib import Path
 # pytest python/test_scraperToData.py
 
 
-# host = "mysql"                  # was "host"
-# user = "root"                   # was "root"
-# passwd = "pwd"                  # was "root"
-# databaseName = "template_db"    # was "testdb"
-host = "localhost"
-user = "root"
-passwd = "root"
-databaseName = "testdb"
+host = "mysql"                  # was "host"
+user = "root"                   # was "root"
+passwd = "pwd"                  # was "root"
+databaseName = "template_db"    # was "testdb"
+# host = "localhost"
+# user = "root"
+# passwd = "root"
+# databaseName = "testdb"
 tablename = "job"
 
 
