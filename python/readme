@@ -1,0 +1,2 @@
+Before Running, Execute the following command to ensure your device has the standalone chrome docker image available:
+docker pull selenium/standalone-chrome
