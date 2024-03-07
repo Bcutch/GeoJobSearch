@@ -1,4 +1,3 @@
-package spring.backend;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DirtiesContext // Use this if you want to reset the Spring ApplicationContext after this test class
-public class TestDatabase {
+public class DatabaseConnectionTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
