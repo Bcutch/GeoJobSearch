@@ -16,9 +16,6 @@ public class DatabaseConnectionTest {
 
     @Test
     void testConnection() {
-        //will display the db it is connected to along with the version number to make sure the dpring is connected to a database
-        // expected output = mariaDB{version_number}
-        // This query is almost universally supported and doesn't depend on your schema
         String version = jdbcTemplate.queryForObject("SELECT VERSION();", String.class);
         assertThat(version).isNotNull();
         System.out.println("Database Version: " + version);
