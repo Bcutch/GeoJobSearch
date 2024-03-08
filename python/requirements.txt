@@ -4,3 +4,5 @@ mysql-connector-python
 pytest
 pytest-cov
 requests
+flake8
+poetry
