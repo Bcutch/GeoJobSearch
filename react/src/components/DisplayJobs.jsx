@@ -17,10 +17,10 @@ const DisplayJobs = () => {
     }
 
   return (
-    <div className="flex justify-center my-4">
-      <div className="flex flex-col gap-4 w-1/2 m-3">
+    <div className="flex justify-center bg-gray-100">
+      <div className="flex flex-col gap-4 w-1/2 m-3 p-3 max-h-[75vh] overflow-y-auto">
         {jobs.map((job, index) => (
-          <div key={index} className="border p-4 rounded-lg" onClick={() => handleClick(job.id)}>
+          <div key={index} className="border p-4 rounded-lg bg-white" onClick={() => handleClick(job.id)}>
             <h2>{job.title}</h2>
             <p>Location: {job.location}</p>
             <a href={job.url} target="_blank" rel="noopener noreferrer">
@@ -32,7 +32,7 @@ const DisplayJobs = () => {
         ))}
       </div>
       {selectedJob ? (
-          <div className="flex flex-col w-[40%] h-[60vh] m-3 border p-4 rounded-lg overflow-y-auto">
+          <div className="flex flex-col w-[40%] h-[60vh] m-3 border p-4 rounded-lg overflow-y-auto bg-white">
             <h3>{selectedJob.title}</h3>
               <p><strong>Location:</strong> {selectedJob.location}</p>
               <p><strong>Salary:</strong> {selectedJob.salary}</p>
