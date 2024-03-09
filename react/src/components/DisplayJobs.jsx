@@ -16,15 +16,11 @@ const DisplayJobs = () => {
         {jobs.map((job, index) => (
           <div key={index} className="border p-4 rounded-lg">
             <h2>{job.title}</h2>
-            <p>Company: {job.company}</p>
             <p>Location: {job.location}</p>
-            <p>Description: {job.description}</p>
             <a href={job.url} target="_blank" rel="noopener noreferrer">
               Apply here
             </a>
             <p>Salary: {job.salary}</p>
-            <p>Field: {job.field}</p>
-            <p>Remote: {job.is_remote ? "Yes" : "No"}</p>
             {/* You can add latitude and longitude if needed */}
           </div>
         ))}
