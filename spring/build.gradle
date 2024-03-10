@@ -39,6 +39,7 @@ pmd {
 
 jacoco {
     toolVersion = "0.8.11" // Specify the JaCoCo version
+	reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
 }
 
  jacocoTestReport {
