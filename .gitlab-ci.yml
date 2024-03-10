@@ -8,6 +8,7 @@ stages:
 variables:
   # Disable Gradle Daemon to avoid potential issues with CI environment
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  JACOCO_CSV_LOCATION: "spring/build/reports/jacoco/test/jacocoTestReport.csv"
 
 # Define the build stage
 build:
