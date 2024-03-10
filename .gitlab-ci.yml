@@ -44,4 +44,4 @@ spring_analysis:
     paths:
       - spring/build/reports/pmd/main.html
       - spring/build/reports/pmd/test.html
-      - spring/build/reports/jacoco/test/jacocoTestReport.csv
+      - spring/build/reports/jacoco/jacocoTestReport.csv
