@@ -39,7 +39,6 @@ pmd {
 
 jacoco {
     toolVersion = "0.8.7" // Specify the JaCoCo version
-	finalizedBy jacocoTestReport
 }
 
  jacocoTestReport {
