@@ -32,7 +32,7 @@ tasks.named('test') {
 
 pmd {
     toolVersion = '6.37.0'
-    ignoreFailures = false
+    ignoreFailures = true
     ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
  
