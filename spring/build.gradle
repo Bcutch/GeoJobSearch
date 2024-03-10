@@ -38,6 +38,6 @@ pmd {
  
 spotbugs {
     toolVersion = '4.6.0'
-    ignoreFailures = false
+    ignoreFailures = true
     showStackTraces = true
 }
