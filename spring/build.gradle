@@ -45,7 +45,6 @@ jacocoTestReport {
     reports {
         csv {
             required = true
-            outputFile = file("$buildDir/reports/jacoco/test/jacocoTestReport.csv")
         }
         xml.required = false 
         html.required = false 
