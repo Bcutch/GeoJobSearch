@@ -24,8 +24,8 @@ build:
     paths:
       # Specify the path to the generated JAR file
       - spring/build/libs/*.jar
-      - build/reports/pmd/main.html
-      - build/reports/pmd/test.html
+      - spring/build/reports/pmd/main.html
+      - spring/build/reports/pmd/test.html
 # # Define the Java analysis stage
 # java_analysis:
 #   stage: java_analysis
