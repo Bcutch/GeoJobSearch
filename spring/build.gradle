@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'pmd'
+	id 'jacoco'
 
 }
 
@@ -35,4 +36,17 @@ pmd {
     ignoreFailures = true
     ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
- 
+
+jacoco {
+    toolVersion = "0.8.7" // Specify the JaCoCo version
+}
+
+jacocoTestReport {
+    reports {
+        csv.enabled true
+        xml.enabled false // Disable XML format if you only need the CSV
+        html.enabled false // Disable HTML format if you don't need it
+    }
+    // Specify the destination for the CSV report
+    getReports().getCsv().setDestination(file("spring/build/reports/jacoco/test/jacocoTestReport.csv"))
+}
