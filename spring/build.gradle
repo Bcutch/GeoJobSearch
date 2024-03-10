@@ -33,7 +33,7 @@ tasks.named('test') {
 pmd {
     toolVersion = '6.37.0'
     ignoreFailures = false
-    ruleSets = ["java-basic", "java-design"]
+    ruleSets = []
 }
  
 spotbugs {

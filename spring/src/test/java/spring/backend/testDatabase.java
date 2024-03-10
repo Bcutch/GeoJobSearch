@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DirtiesContext // Use this if you want to reset the Spring ApplicationContext after this test class
-public class DatabaseConnectionTest {
+public class testDatabase {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
