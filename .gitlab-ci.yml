@@ -1,9 +1,7 @@
 # Define the stages of the CI pipeline
 stages:
   - build
-  - java_analysis
-  - python_analysis
-  - test
+  - react_analysis
 
 # Set environment variables or configuration options
 variables:
@@ -26,47 +24,11 @@ build:
       - spring/build/libs/*.jar
       - spring/build/reports/pmd/main.html
       - spring/build/reports/pmd/test.html
-# # Define the Java analysis stage
-# java_analysis:
-#   stage: java_analysis
-#   image: eclipse-temurin
-#   # Script to execute for the Java analysis stage
-#   script:
-#     - cd spring
-#     # Run PMD analysis
-#     - ./gradlew pmdMain
-#     # Run SpotBugs analysis
-#     - ./gradlew spotbugsMain
 
-# # Define the Python analysis stage
-# python_analysis:
-#   stage: python_analysis
-#   image: python:3.9
-#   # Script to execute for the Python analysis stage
-#   script:
-#     - cd python
-#     # Install Poetry
-#     - curl -sSL https://install.python-poetry.org | python -
-#     # Install dependencies using Poetry
-#     - poetry install
-#     # Run linting with Poetry
-#     - poetry run lint
-
-# # Define the test stage
-# test:
-#   stage: test
-#   image: python:3.9
-#   # Script to execute for the test stage
-#   script:
-#     - cd python
-#     # Install Poetry
-#     - pip install -r requirements.txt
-#     - curl -sSL https://install.python-poetry.org | python -
-#     # Install dependencies using Poetry
-#     - poetry install
-#     # Run tests with Poetry
-#     - poetry run pytest
-#   # Ensure that the pipeline fails if any errors occur during testing
-#   rules:
-#     - when: always
-#       allow_failure: false
+react_analysis:
+  stage: react_analysis
+  image: node:latest
+  script:
+    - cd react
+    - npm install
+    - npm run lint
