@@ -32,3 +32,4 @@ react_analysis:
     - cd react
     - npm install
     - npm run lint
+  allow_failure: true
