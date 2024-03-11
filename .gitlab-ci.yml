@@ -18,7 +18,7 @@ build:
   # Script to execute for the build stage
   script:
     - cd spring
-    # Execute Gradle build excluding tests
+    # Execute Gradle build excluding tests, runs pmd here for linting
     - ./gradlew build -x test
   # Define artifacts to be preserved from this stage
   artifacts:
@@ -43,8 +43,6 @@ spring_analysis:
     - ./gradlew test
   artifacts:
     paths:
-      - spring/build/reports/pmd/main.html
-      - spring/build/reports/pmd/test.html
       - spring/build/jacocoHtml/index.html
 
 python_analysis:
@@ -53,6 +51,8 @@ python_analysis:
   script:
     - cd python
     - pip install -r requirements.txt
+    - ls
+    - export PYTHONPATH=./
     - pytest test_scrapingBot.py
     - pytest test_scrapingBot.py --cov
     - pytest test_scraperToData.py
