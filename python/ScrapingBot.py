@@ -3,6 +3,7 @@ from selenium import webdriver
 from scraperToData import scraperToDataConnection
 import mysql.connector
 from bs4 import BeautifulSoup
+import os
 
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
 time.sleep(60)
@@ -64,7 +65,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         
         # init driver
         # driver should be init within this loop so indeed doesn't stop scraping
-        serverURL = "http://selenium:4444/wd/hub"
+        serverURL = os.environ.get('SELENIUM_SERVER_URL', "http://localhost:4444/wd/hub")
         # init driver
         options = webdriver.ChromeOptions()
         options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
@@ -320,7 +321,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         raise ValueError("Parameters not allowing scraping")
     linkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
     
-    serverURL = "http://selenium:4444/wd/hub"
+    serverURL = os.environ.get('SELENIUM_SERVER_URL', "http://localhost:4444/wd/hub")
     # init driver
     options = webdriver.ChromeOptions()
     options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
