@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 
 const Search = () => {
   return (
-    <div className="flex justify-center pt-4">
+    <div className="flex justify-center pt-4 bg-gray-100">
       <Form className="flex gap-2">
         <Form.Group>
           <Form.Control type="search" placeholder="Search" />
