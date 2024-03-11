@@ -53,9 +53,6 @@ python_analysis:
       alias: selenium
   variables:
     SELENIUM_SERVER_URL: "http://selenium:4444/wd/hub"
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq netcat
-    - while ! nc -z selenium 4444; do sleep 1; done
   script:
     - cd python
     - pip install -r requirements.txt
