@@ -1,4 +1,4 @@
-import time, json
+import time, json, re
 from selenium import webdriver
 from scraperToData import scraperToDataConnection
 import mysql.connector
@@ -121,7 +121,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
                             + jobPostingDict['datePosted'][8]+jobPostingDict['datePosted'][9])
                 
                 #description
-                description = jobPostingDict['description']
+                description = re.sub('<[^<]+?>', '', jobPostingDict.get('description', ''))
             
             #remoteness
             remote = jobSoup.find('div', 'css-6z8o9s eu4oa1w0')
