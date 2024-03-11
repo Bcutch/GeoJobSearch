@@ -187,7 +187,7 @@ class scraperToDataConnection:
                 if 'salary' in job and isinstance(job['salary'], str):
                     salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])
                     if len(salaries) > 0:
-                        salary = round(sum(int(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
+                        salary = round(sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
                         values[5] = salary  # Set calculated salary
             
                 self.cursor.execute(query, tuple(values))
