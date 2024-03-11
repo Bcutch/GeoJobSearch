@@ -44,7 +44,6 @@ spring_analysis:
   artifacts:
     paths:
       - spring/build/jacoco/index.html
-      - spring/build/jacoco/jacocoTestReport.csv
 
 python_analysis:
   stage: python_analysis
