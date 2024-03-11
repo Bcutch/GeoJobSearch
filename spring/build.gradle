@@ -50,7 +50,7 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = false
-        csv.required = true
+        csv.required = false
         html.outputLocation = layout.buildDirectory.dir('jacoco')
     }
 }

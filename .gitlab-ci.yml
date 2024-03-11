@@ -40,7 +40,6 @@ spring_analysis:
   script:
     - cd spring
     - ./gradlew test
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print "Total coverage:\s", 100*covered/instructions,  "%"}' /build/jacoco/jacocoTestReport.csv
 
   artifacts:
     paths:
