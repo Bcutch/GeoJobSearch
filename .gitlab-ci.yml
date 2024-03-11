@@ -39,9 +39,20 @@ spring_analysis:
   image: eclipse-temurin
   script:
     - cd spring
-    - ./gradlew check
+    - ./gradlew test
   artifacts:
     paths:
       - spring/build/reports/pmd/main.html
       - spring/build/reports/pmd/test.html
-      - spring/build/reports/jacoco/jacocoTestReport.csv
+      - spring/build/jacocoHtml/index.html
+
+python_analysis:
+  stage: python_analysis
+  image: python:3.11
+  script:
+    - cd python
+    - pip install -r requirements.txt
+    - pytest test_scrapingBot.py
+    - pytest test_scrapingBot.py --cov
+    - pytest test_scraperToData.py
+    - pytest test_scraperToData.py --cov

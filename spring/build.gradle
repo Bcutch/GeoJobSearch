@@ -2,13 +2,9 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.4'
-<<<<<<< HEAD
 	id 'pmd'
 	id 'jacoco'
 
-=======
-	id 'jacoco'
->>>>>>> c4ae7ec5f7ccdea5050cc438e6b461aad7ee67f1
 }
 
 group = 'spring'
@@ -40,29 +36,14 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-<<<<<<< HEAD
 pmd {
     toolVersion = '6.37.0'
     ignoreFailures = true
     ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
 
-jacoco {
-    toolVersion = "0.8.11" // Specify the JaCoCo version
-	reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
-}
-
- jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
-    reports {
-        csv.required = true
-     }
-}
-=======
-
 test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
-	
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
@@ -73,4 +54,3 @@ jacocoTestReport {
     }
 }
 
->>>>>>> c4ae7ec5f7ccdea5050cc438e6b461aad7ee67f1
