@@ -51,8 +51,12 @@ python_analysis:
   services:
     - name: selenium/standalone-chrome
       alias: selenium
+    - name: mysql:latest
+      alias: mysql
   variables:
     SELENIUM_SERVER_URL: "http://selenium:4444/wd/hub"
+    MYSQL_DATABASE: template_db
+    MYSQL_ROOT_PASSWORD: pwd
   script:
     - cd python
     - pip install -r requirements.txt
