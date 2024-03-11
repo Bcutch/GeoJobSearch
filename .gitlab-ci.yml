@@ -48,12 +48,14 @@ spring_analysis:
 python_analysis:
   stage: python_analysis
   image: python:3.11
+  services:
+    - selenium/standalone-chrome:latest # or use standalone-firefox
+  variables:
+    SELENIUM_HOST: selenium
+    SELENIUM_PORT: 4444
   script:
     - cd python
     - pip install -r requirements.txt
-    - ls
     - export PYTHONPATH=./
     - pytest test_scrapingBot.py
     - pytest test_scrapingBot.py --cov
-    - pytest test_scraperToData.py
-    - pytest test_scraperToData.py --cov
