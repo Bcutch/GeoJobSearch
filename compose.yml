@@ -48,7 +48,7 @@ services:
       - spring-react # Allow the react app to discover the spring app
 
   selenium:
-    image: selenium/standalone-chrome
+    image: seleniarm/standalone-chromium
     ports:
       - "4444:4444"
       - "7900:7900"
