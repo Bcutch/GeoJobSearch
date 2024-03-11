@@ -3,6 +3,7 @@ stages:
   - build
   - react_analysis
   - spring_analysis
+  - python_analysis
 
 # Set environment variables or configuration options
 variables:
