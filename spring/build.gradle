@@ -38,20 +38,17 @@ dependencies {
 
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
 test {
     finalizedBy jacocoTestReport
+    useJUnitPlatform()
 }
 
 jacocoTestReport {
     dependsOn test
     reports {
         xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        csv.outputLocation = layout.buildDirectory.dir('jacoco')
+        html.outputLocation = layout.buildDirectory.dir('jacoco')
     }
 }
 
