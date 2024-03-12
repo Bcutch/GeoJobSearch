@@ -1,7 +1,5 @@
 import mysql.connector
 import re
-import os
-from pathlib import Path
     
 # can be tested by running:
 # pytest python/test_scraperToData.py
@@ -54,8 +52,10 @@ class scraperToDataConnection:
             self.cursor = self.databaseConnection.cursor()     # init cursor
         
         # create table if not exists
-        if self.dropTable and self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
-        if autoConnect: self.createJobTable()
+        if self.dropTable and self.tableExists('job'):
+            self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
+        if autoConnect:
+            self.createJobTable()
         
         
 
@@ -67,9 +67,11 @@ class scraperToDataConnection:
         """
         try:
             self.cursor.close()
-            if self.debugFeedback: print(f"Cursor closed Successfully.")
+            if self.debugFeedback:
+                print("Cursor closed Successfully.")
             self.databaseConnection.close()
-            if self.debugFeedback: print(f"Database: {self.databaseName} closed Successfully.")
+            if self.debugFeedback:
+                print(f"Database: {self.databaseName} closed Successfully.")
             return True
         except Exception as error:
             if self.debugFeedback:
@@ -88,7 +90,7 @@ class scraperToDataConnection:
         buildString += f"\tdatabasename: {self.databaseName}\n"
         buildString += f"\tdebugFeedback: {self.debugFeedback}\n"
         buildString += "Summary:\n"
-        if self.databaseConnection != None: 
+        if self.databaseConnection is not None: 
             buildString += f"Connected to Database: {self.databaseName}: {self.databaseConnection.is_connected()}\n"
         else:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
@@ -110,11 +112,13 @@ class scraperToDataConnection:
             # conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             
-            if self.debugFeedback: print(f"Database: {self.databaseName} successfully connected")
+            if self.debugFeedback: 
+                print(f"Database: {self.databaseName} successfully connected")
             return conn
         
         except Exception as error:
-            if self.debugFeedback: print(error)
+            if self.debugFeedback:
+                print(error)
             raise ConnectionError   # table could not be connected to
 
     def tableExists(self, tablename:str=tablename) -> bool:
@@ -131,7 +135,8 @@ class scraperToDataConnection:
         # {tablename}
         result = self.cursor.fetchone()[0] == 1  # check if table exists
         
-        if self.debugFeedback: print(f"{self.databaseName} existence={result}")
+        if self.debugFeedback: 
+            print(f"{self.databaseName} existence={result}")
         
         return result                   # return result of if table exists
     
@@ -188,7 +193,8 @@ class scraperToDataConnection:
                     int(job['remote']) if 'remote' in job else 0
                 ]
                 
-                if len(job["url"]) > 2083: raise mysql.connector.errors.DataError
+                if len(job["url"]) > 2083: 
+                    raise mysql.connector.errors.DataError
             
                 # Calculate and set salary
                 if 'salary' in job and isinstance(job['salary'], str):
@@ -200,7 +206,8 @@ class scraperToDataConnection:
                 self.cursor.execute(query, tuple(values))
                 self.databaseConnection.commit()
             except mysql.connector.IntegrityError as error:
-                if self.debugFeedback: print(error)
+                if self.debugFeedback: 
+                    print(error)
                 if str(error)[:4] != "1062":
                     raise
 

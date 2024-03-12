@@ -28,12 +28,19 @@ fakeDataTitle = 'THIS_IS_A_UNIT_TEST_TITLE'     # the title used for fake data w
 mockDbConn = None
 
 
+# create setup function for mock database
+# whenever this function is passed as input, the return value will be used
 @pytest.fixture()
 def mockDatabase() -> scraperToDataConnection:
-    mockDbConn = scraperToDataConnection(autoConnect=False)
+    # init mock database
+    mockDbConn = scraperToDataConnection(autoConnect=False)  # do not attempt to connect because it will not work
+    
+    # set cursor and database connection to Mock (fake data)
+    # this will allow inputs to these variables from inside the class to evaluate outputs
     mockDbConn.databaseConnection = MagicMock()
     mockDbConn.cursor = MagicMock()
     
+    # return this mock class
     return mockDbConn
 
 
@@ -80,7 +87,7 @@ def testImproperdatabaseName(improperdatabaseName):
 
 def testDatabaseClosesProperly():
     connection = scraperToDataConnection(autoConnect=False)
-    assert connection.__del__() == False     # no database active so it shouldnt close properly
+    assert connection.__del__() is False     # no database active so it shouldnt close properly
 
 
 @pytest.mark.parametrize("databaseName", 
@@ -121,7 +128,7 @@ def testAddMultipleData(mockDatabase):
         'seniority': "High-level",
         'description': "The \tcraziest job you'll ever see!!\n\n."
         }]
-    assert mockDatabase.addJobData(data) == True     # we will add this same data multiple times to check for duplicates
+    assert mockDatabase.addJobData(data) is True     # we will add this same data multiple times to check for duplicates
     
     
 def testLongUrlLength(mockDatabase):
@@ -174,7 +181,7 @@ def testAddCorrectRemoteValue(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'remote': False              # should be a bool, not string
         }]
-    assert mockDatabase.addJobData(remoteData) == True
+    assert mockDatabase.addJobData(remoteData) is True
     
     
 def testHandleExtraData(mockDatabase):
@@ -186,7 +193,7 @@ def testHandleExtraData(mockDatabase):
         'cat': 'yes',
         'dog': 'no'
         }]
-    assert mockDatabase.addJobData(extraData) == True            # should raise no errors
+    assert mockDatabase.addJobData(extraData) is True            # should raise no errors
     
     
 def testAddCorrectSalary(mockDatabase):
@@ -196,7 +203,7 @@ def testAddCorrectSalary(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'salary': 'around $150,000 per year'
         }]
-    assert mockDatabase.addJobData(data) == True           # should raise no errors
+    assert mockDatabase.addJobData(data) is True           # should raise no errors
 
     
 def testAddNumericSalary(mockDatabase):
@@ -206,7 +213,7 @@ def testAddNumericSalary(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'salary': 150_000
         }]
-    assert mockDatabase.addJobData(data) == True            # should raise no errors
+    assert mockDatabase.addJobData(data) is True            # should raise no errors
     
     
 # # I made this before I realized we wouldn't be accessing the database like this

@@ -20,7 +20,8 @@
 import pytest                               # testing module
 import ScrapingBot      # ScrapingBot.py 
 import subprocess
-import os, time
+import os
+import time
 
 
 
@@ -45,7 +46,7 @@ def setupScrapeData():
         endTime = time.time() + 10  # will end after a timeout of 10 seconds
         curTime = time.time()
         
-        while process == None and curTime < endTime:
+        while process is None and curTime < endTime:
             curTime = time.time()   # waits for process to be not None or time happens
             
         ScrapingBot.scrapeIndeed(numPages=1, jobData=indeedJobData, jobLimit=10, serverHostname="localhost")
