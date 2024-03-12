@@ -16,6 +16,8 @@
 import pytest                               # testing module
 import mysql.connector                      # sql
 from scraperToData import scraperToDataConnection      # scraperToDataConnection class
+from mock import MagicMock
+
 
 # tests:
 # these functions don't have any naming restrictions from pytest
@@ -23,6 +25,27 @@ from scraperToData import scraperToDataConnection      # scraperToDataConnection
 
 fakeDataTitle = 'THIS_IS_A_UNIT_TEST_TITLE'     # the title used for fake data when inserting it into the database
 # this is important to know what to remove later
+
+@pytest.fixture
+def flask_app_mock():
+    # flask application set up.
+    app_mock = Flask(__name__)
+    db = SQLAlchemy(app_mock)
+    db.init_app(app_mock)
+    return app_mock    
+
+@pytest.fixture
+def mock_get_sqlalchemy(mocker):
+    mock = mocker.patch("flask_sqlalchemy._QueryProperty.__get__").return_value = mocker.Mock()
+    return mock
+
+def test_add_word():
+    with mock.patch('api.app.db') as mockdb:
+        mockdb.add = mock.MagicMock(return_value="your desired return value")
+        result = app.add_word('shivam')
+    print(result)
+
+
 
 def testImproperHostname():
     improperHostname = "ja,s1f#a sh!/"    # assuming a hostname can't be the same name as this gibberish
