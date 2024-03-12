@@ -48,18 +48,8 @@ spring_analysis:
 python_analysis:
   stage: python_analysis
   image: python:3.11
-  services:
-    - name: selenium/standalone-chrome
-      alias: selenium
-    - name: mysql:latest
-      alias: mysql
-  variables:
-    SELENIUM_SERVER_URL: "http://selenium:4444/wd/hub"
-    MYSQL_DATABASE: template_db
-    MYSQL_ROOT_PASSWORD: pwd
   script:
     - cd python
     - pip install -r requirements.txt
-    - export PYTHONPATH=./
     - pylint ./ || true
-    - pytest test_scrapingBot.py --cov
+    - pytest
