@@ -18,7 +18,7 @@ for element in jobDict:
     print(element['title'])
     
 # connect to mySQL job table
-connection = scraperToData.scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db", dropTable=True)
+connection = scraperToData.scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
 print("connected to db")
 
 # add jobs to table
