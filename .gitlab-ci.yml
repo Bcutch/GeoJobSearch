@@ -48,8 +48,8 @@ python_analysis:
   stage: python_analysis
   image: python:3.11
   before_script:
-    - apt-get update && apt-get install -y openjdk-11-jre
-    - java -version
+    - apt-get update && apt-get install -y default-jre
+    - java -version # Confirm Java is installed correctly
   script:
     - cd python
     - pip install -r requirements.txt
