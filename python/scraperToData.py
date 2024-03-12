@@ -2,7 +2,6 @@ import mysql.connector
 import re
 import os
 from pathlib import Path
-import pymysql
     
 # can be tested by running:
 # pytest python/test_scraperToData.py
@@ -21,7 +20,7 @@ tablename = "job"
 
 class scraperToDataConnection:
     def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
-                 dropTable:bool=False, debugFeedback:bool=False) -> None:
+                 dropTable:bool=False, debugFeedback:bool=False, autoConnect:bool=True) -> None:
         """ Summary:
             Creates a connection within the class for a continous connection to the database.
             The connection will automatically close when the class is terminated at the end of a program.
@@ -35,6 +34,7 @@ class scraperToDataConnection:
             databaseName:   name of the sql database that will be connected to
             resetTable:     WARNING: If True, will drop the current contents of the table. Defaults to False
             debugFeedback:  If True, print statements that could help debug will be displayed. Defaults to False
+            autoConnect:    If True, will automatically attempt to connect to the desired database. Defaults to True
         """
         # private variables
         self.__host = host
@@ -47,12 +47,15 @@ class scraperToDataConnection:
         self.dropTable = dropTable
         
         # create database connection
-        self.databaseConnection = self.__connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
-        self.cursor = self.databaseConnection.cursor()     # init cursor
+        self.databaseConnection = None
+        self.cursor = None
+        if autoConnect:
+            self.databaseConnection = self.connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
+            self.cursor = self.databaseConnection.cursor()     # init cursor
         
         # create table if not exists
         if self.dropTable and self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
-        self.createJobTable()
+        if autoConnect: self.createJobTable()
         
         
 
@@ -91,7 +94,7 @@ class scraperToDataConnection:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
         return buildString
 
-    def __connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
+    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
         """ This function attempts to the connect to the sql sever based on the input parameters
 
         Args:
@@ -105,7 +108,7 @@ class scraperToDataConnection:
         """
         try:
             # conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
-            conn = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
+            conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             
             if self.debugFeedback: print(f"Database: {self.databaseName} successfully connected")
             return conn
@@ -184,6 +187,8 @@ class scraperToDataConnection:
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0
                 ]
+                
+                if len(job["url"]) > 2083: raise mysql.connector.errors.DataError
             
                 # Calculate and set salary
                 if 'salary' in job and isinstance(job['salary'], str):

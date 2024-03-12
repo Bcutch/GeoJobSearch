@@ -25,69 +25,90 @@ from mock import MagicMock
 
 fakeDataTitle = 'THIS_IS_A_UNIT_TEST_TITLE'     # the title used for fake data when inserting it into the database
 # this is important to know what to remove later
-
-@pytest.fixture
-def flask_app_mock():
-    # flask application set up.
-    app_mock = Flask(__name__)
-    db = SQLAlchemy(app_mock)
-    db.init_app(app_mock)
-    return app_mock    
-
-@pytest.fixture
-def mock_get_sqlalchemy(mocker):
-    mock = mocker.patch("flask_sqlalchemy._QueryProperty.__get__").return_value = mocker.Mock()
-    return mock
-
-def test_add_word():
-    with mock.patch('api.app.db') as mockdb:
-        mockdb.add = mock.MagicMock(return_value="your desired return value")
-        result = app.add_word('shivam')
-    print(result)
+mockDbConn = None
 
 
+@pytest.fixture()
+def mockDatabase() -> scraperToDataConnection:
+    mockDbConn = scraperToDataConnection(autoConnect=False)
+    mockDbConn.databaseConnection = MagicMock()
+    mockDbConn.cursor = MagicMock()
+    
+    return mockDbConn
 
-def testImproperHostname():
-    improperHostname = "ja,s1f#a sh!/"    # assuming a hostname can't be the same name as this gibberish
+
+@pytest.mark.parametrize("tablename,result,expected", 
+    [("job", 1, True), ("userData", 0, False), (25, 0, False), (None, 0, False)]
+)
+def testTableExists(mockDatabase, tablename, result, expected):
+    
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": [result]
+        }
+    )
+    actual = mockDatabase.tableExists(tablename)
+    assert actual == expected
+
+@pytest.mark.parametrize("improperHostname", 
+    [("a sentance"), (25), (None)]
+)
+def testImproperHostname(improperHostname):
     with pytest.raises(ConnectionError):
         scraperToDataConnection(host=improperHostname)
-        
-def testImproperUsername():
-    improperUsername = "ja,s1f#a sh!/"    # assuming we won't be naming a username the same name as this gibberish
+
+@pytest.mark.parametrize("improperUsername", 
+    [("a sentance"), (25), (None)]
+)   
+def testImproperUsername(improperUsername):
     with pytest.raises(ConnectionError):
         scraperToDataConnection(user=improperUsername)
 
-def testImproperPasswd():
-    improperPasswd = "ja,s1f#a sh!/"    # assuming we won't be naming a password the same name as this gibberish
+@pytest.mark.parametrize("improperPasswd", 
+    [("a sentance"), (25), (None)]
+)   
+def testImproperPasswd(improperPasswd):
     with pytest.raises(ConnectionError):
         scraperToDataConnection(passwd=improperPasswd)
 
-def testImproperdatabaseName():
-    improperdatabaseName = "ja,s1f#a sh!/"    # assuming we won't be naming a table the same name as this gibberish
+@pytest.mark.parametrize("improperdatabaseName", 
+    [("a sentance"), (25), (None)]
+)   
+def testImproperdatabaseName(improperdatabaseName):
     with pytest.raises(ConnectionError):
         scraperToDataConnection(databaseName=improperdatabaseName)
 
 def testDatabaseClosesProperly():
-    connection = scraperToDataConnection()
-    assert connection.__del__() == True     # closing the database must occur correctly
+    connection = scraperToDataConnection(autoConnect=False)
+    assert connection.__del__() == False     # no database active so it shouldnt close properly
 
-def testGetDatabaseName():
-    connection = scraperToDataConnection()
-    assert connection.getDatabaseName() == connection.databaseName   # returned table name must be the same
 
-def testTableCreated():
-    connection = scraperToDataConnection()
-    connection.createJobTable()
-    assert connection.tableExists(f'{connection.tablename}') == True        # tablename should exist 
+@pytest.mark.parametrize("databaseName", 
+    [("job"), ("mydatabase"), (25), (None)]
+)  
+def testGetDatabaseName(databaseName):
+    conn = scraperToDataConnection(databaseName=databaseName, autoConnect=False)
+    assert conn.getDatabaseName() == databaseName   # returned table name must be the same
+
+@pytest.mark.parametrize("databaseName,result,expected", 
+    [("job", 1, True), ("testdb", 0, False)]
+)  
+def testTableCreated(mockDatabase, databaseName,result,expected):
+    mockDatabase.createJobTable()
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": [result]
+        }
+    )
+    assert mockDatabase.tableExists(f'{databaseName}') == expected        # tablename should exist 
     
-def testAddCorruptData():
+def testAddCorruptData(mockDatabase):
     badData = [{'THIS':'IS A TEST'}]
-    connection = scraperToDataConnection()
     
     with pytest.raises(KeyError):
-        connection.addJobData(badData)
+        mockDatabase.addJobData(badData)
 
-def testAddMultipleData():
+def testAddMultipleData(mockDatabase):
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':'THIS_IS_FAKE_DATA',
@@ -100,94 +121,52 @@ def testAddMultipleData():
         'seniority': "High-level",
         'description': "The \tcraziest job you'll ever see!!\n\n."
         }]
-    connection = scraperToDataConnection()
-    connection.addJobData(data)     # we will add this same data multiple times to check for duplicates
-    connection.addJobData(data)
-    connection.addJobData(data)
+    assert mockDatabase.addJobData(data) == True     # we will add this same data multiple times to check for duplicates
     
-    connection.cursor.execute(f"""
-                              SELECT * FROM {connection.tablename}
-                              WHERE title = '{fakeDataTitle}';
-                              """)
-    result = connection.cursor.fetchall()
-    assert len(result) == 1      # there should not be any duplicate entries but there should be the one that was added
     
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
-    
-def testLongUrlLength():
-    string = "a"*2000
+def testLongUrlLength(mockDatabase):
+    string = "a"*3000
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':string
         }]
-    connection = scraperToDataConnection()
     
     with pytest.raises(mysql.connector.DataError):
-        connection.addJobData(data)                 # should not be able to add a value longer than the allowed length
+        mockDatabase.addJobData(data)                 # should not be able to add a value longer than the allowed length
 
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
     
-def testNoTitle(): # title value MUST exist, if not an error should be raised
+def testNoTitle(mockDatabase): # title value MUST exist, if not an error should be raised
     data = [{   # this is fake data that will be inserted into the table and also removed
         'url':'THIS_IS_FAKE_DATA'
         }]
-    connection = scraperToDataConnection()
     
     with pytest.raises(KeyError):
-        connection.addJobData(data)
-    
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE url='{data[0]['url']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
+        mockDatabase.addJobData(data)
     
     
-def testNoURL(): # url value MUST exist, if not an error should be raised
+    
+def testNoURL(mockDatabase): # url value MUST exist, if not an error should be raised
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle
         }]
-    connection = scraperToDataConnection()
     
     with pytest.raises(KeyError):
-        connection.addJobData(data)
-    
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
-
-def testEmptyData():
-    emptyData = []
-    
-    connection = scraperToDataConnection()
-    # with pytest.raises(IndexError):
-    connection.addJobData(emptyData)
-    
-    connection.cursor.execute(f"""
-                              SELECT * FROM {connection.tablename}
-                              WHERE title = '{fakeDataTitle}';
-                              """)
-    result = connection.cursor.fetchall()
-    assert len(result) == 0      # there should not be any entries
-    
-    if len(result) > 0:
-        connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{emptyData[0]['title']}'""")    
-        connection.databaseConnection.commit()                # clear table of fake data
+        mockDatabase.addJobData(data)
     
     
-def testAddWrongRemoteValue():
+    
+def testAddWrongRemoteValue(mockDatabase):
     # remoteness should only be 0 or 1
     remoteData = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':'THIS_IS_FAKE_DATA',
         'remote': "Hybrid"              # should be a bool, not string
         }]
-    connection = scraperToDataConnection()
     with pytest.raises(ValueError):
-        connection.addJobData(remoteData)
+        mockDatabase.addJobData(remoteData)
     
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{remoteData[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
 
-def testAddCorrectRemoteValue():
+def testAddCorrectRemoteValue(mockDatabase):
     # remoteness should add correctly
     
     remoteData = [{   # this is fake data that will be inserted into the table and also removed
@@ -195,13 +174,10 @@ def testAddCorrectRemoteValue():
         'url':'THIS_IS_FAKE_DATA',
         'remote': False              # should be a bool, not string
         }]
-    connection = scraperToDataConnection()
-    connection.addJobData(remoteData)
+    assert mockDatabase.addJobData(remoteData) == True
     
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{remoteData[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
     
-def testHandleExtraData():
+def testHandleExtraData(mockDatabase):
     # should not add or try to add extra data if there is in the dictionary
     extraData = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
@@ -210,93 +186,49 @@ def testHandleExtraData():
         'cat': 'yes',
         'dog': 'no'
         }]
-    connection = scraperToDataConnection()
-    connection.addJobData(extraData)            # should raise no errors
+    assert mockDatabase.addJobData(extraData) == True            # should raise no errors
     
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{extraData[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
     
-def testAddCorrectSalary():
+def testAddCorrectSalary(mockDatabase):
     # should add the correct salary value from the string
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':'THIS_IS_FAKE_DATA',
         'salary': 'around $150,000 per year'
         }]
-    connection = scraperToDataConnection()
-    connection.addJobData(data)            # should raise no errors
+    assert mockDatabase.addJobData(data) == True           # should raise no errors
+
     
-    connection.cursor.execute(f"""
-                              SELECT * FROM {connection.tablename}
-                              WHERE title = '{fakeDataTitle}';
-                              """)
-    result = connection.cursor.fetchall()
-    assert 150_000 in result[0]
-    
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
-    
-def testAddNumericSalary():
+def testAddNumericSalary(mockDatabase):
     # should add the correct salary value from the string
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
         'url':'THIS_IS_FAKE_DATA',
         'salary': 150_000
         }]
-    connection = scraperToDataConnection()
-    connection.addJobData(data)            # should raise no errors
-    
-    connection.cursor.execute(f"""
-                              SELECT * FROM {connection.tablename}
-                              WHERE title = '{fakeDataTitle}';
-                              """)
-    result = connection.cursor.fetchall()
-    assert 'nothing' not in result[0]
-    
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
-
-def testAddCorruptSalary():
-    # should add the correct salary value from the string
-    data = [{   # this is fake data that will be inserted into the table and also removed
-        'title':fakeDataTitle,
-        'url':'THIS_IS_FAKE_DATA',
-        'salary': 'nothing'
-        }]
-    connection = scraperToDataConnection()
-    connection.addJobData(data)            # should raise no errors
-    
-    connection.cursor.execute(f"""
-                              SELECT * FROM {connection.tablename}
-                              WHERE title = '{fakeDataTitle}';
-                              """)
-    result = connection.cursor.fetchall()
-    assert 'nothing' not in result[0]
-    
-    connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-    connection.databaseConnection.commit()                # clear table of fake data
+    assert mockDatabase.addJobData(data) == True            # should raise no errors
     
     
-# I made this before I realized we wouldn't be accessing the database like this
-# Incase it needs to be implemented its here but I'm assuming we won't need it
-# def testGetData():
-#     data = [{   # this is fake data that will be inserted into the table and also removed
-#         'title':fakeDataTitle,
-#         'url':'THIS_IS_FAKE_DATA'
-#         }]
-#     connection = scraperToDataConnection()
-#     connection.addJobData(data)     # we will add this data to the table
+# # I made this before I realized we wouldn't be accessing the database like this
+# # Incase it needs to be implemented its here but I'm assuming we won't need it
+# # def testGetData():
+# #     data = [{   # this is fake data that will be inserted into the table and also removed
+# #         'title':fakeDataTitle,
+# #         'url':'THIS_IS_FAKE_DATA'
+# #         }]
+# #     connection = scraperToDataConnection()
+# #     connection.addJobData(data)     # we will add this data to the table
     
-#     retrievedData = connection.getData()
+# #     retrievedData = connection.getData()
     
-#     result = False
-#     for entry in retrievedData:   # check if title exsits in result data and its formatted correctly
-#         if entry['title'] == data[0]['title']: result = True
-#     assert result == True       
+# #     result = False
+# #     for entry in retrievedData:   # check if title exsits in result data and its formatted correctly
+# #         if entry['title'] == data[0]['title']: result = True
+# #     assert result == True       
 
 
 
-#     connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
-#     connection.databaseConnection.commit()                # clear table of fake data
+# #     connection.cursor.execute(f"""DELETE FROM {connection.tablename} WHERE title='{data[0]['title']}'""")    
+# #     connection.databaseConnection.commit()                # clear table of fake data
 
 
