@@ -46,7 +46,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:s
         ValueError: Input parameter to function was incorrect
     """
     
-    if isinstance(jobData, list): 
+    if isinstance(jobData, list) is False: 
         raise ValueError("jobData type not a list")
     if numPages <= 0 or jobLimit == 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
         raise ValueError("Parameters not allowing scraping")

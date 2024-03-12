@@ -22,6 +22,7 @@ import ScrapingBot      # ScrapingBot.py
 import subprocess
 import os
 import time
+from selenium import webdriver
 
 
 
@@ -50,7 +51,7 @@ def setupScrapeData():
             curTime = time.time()   # waits for process to be not None or time happens
             
         ScrapingBot.scrapeIndeed(numPages=1, jobData=indeedJobData, jobLimit=10, serverHostname="localhost")
-        # ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInJobData, jobLimit=10, serverHostname="localhost")
+        ScrapingBot.scrapeLinkedIn(numPages=1, jobData=linkedInJobData, jobLimit=10, serverHostname="localhost")
         
         yield
         process.kill()
@@ -94,4 +95,19 @@ def testLinkedInScraperNoPages() -> None:
     emptyData = []
     with pytest.raises(ValueError):
         ScrapingBot.scrapeIndeed(0, emptyData)
+        
+        
+def testGetSoupForLinkedInBadURL():
+    options = webdriver.ChromeOptions()
+    options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Remote(options=options)
+    driver.implicitly_wait(10)
+    driver.set_page_load_timeout(20)    # raises error if page not found in 20 seconds
+    
+        
+    badurl = "google.google"
+    with pytest.raises(ConnectionError):
+        ScrapingBot.getSoupforLinkedIn(url=badurl, driver=driver, options=options)
         
