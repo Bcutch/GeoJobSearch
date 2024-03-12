@@ -1,7 +1,5 @@
 import mysql.connector
 import re
-import os
-from pathlib import Path
     
 # can be tested by running:
 # pytest python/test_scraperToData.py
@@ -20,7 +18,7 @@ tablename = "job"
 
 class scraperToDataConnection:
     def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
-                 dropTable:bool=False, debugFeedback:bool=False) -> None:
+                 dropTable:bool=False, debugFeedback:bool=False, autoConnect:bool=True) -> None:
         """ Summary:
             Creates a connection within the class for a continous connection to the database.
             The connection will automatically close when the class is terminated at the end of a program.
@@ -34,6 +32,7 @@ class scraperToDataConnection:
             databaseName:   name of the sql database that will be connected to
             resetTable:     WARNING: If True, will drop the current contents of the table. Defaults to False
             debugFeedback:  If True, print statements that could help debug will be displayed. Defaults to False
+            autoConnect:    If True, will automatically attempt to connect to the desired database. Defaults to True
         """
         # private variables
         self.__host = host
@@ -46,12 +45,17 @@ class scraperToDataConnection:
         self.dropTable = dropTable
         
         # create database connection
-        self.databaseConnection = self.__connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
-        self.cursor = self.databaseConnection.cursor()     # init cursor
+        self.databaseConnection = None
+        self.cursor = None
+        if autoConnect:
+            self.databaseConnection = self.connectDatabase(host=self.__host, user=self.__user, passwd=self.__passwd, database=self.databaseName)
+            self.cursor = self.databaseConnection.cursor()     # init cursor
         
         # create table if not exists
-        if self.dropTable and self.tableExists('job'): self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
-        self.createJobTable()
+        if self.dropTable and self.tableExists('job'):
+            self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
+        if autoConnect:
+            self.createJobTable()
         
         
 
@@ -63,9 +67,11 @@ class scraperToDataConnection:
         """
         try:
             self.cursor.close()
-            if self.debugFeedback: print(f"Cursor closed Successfully.")
+            if self.debugFeedback:
+                print("Cursor closed Successfully.")
             self.databaseConnection.close()
-            if self.debugFeedback: print(f"Database: {self.databaseName} closed Successfully.")
+            if self.debugFeedback:
+                print(f"Database: {self.databaseName} closed Successfully.")
             return True
         except Exception as error:
             if self.debugFeedback:
@@ -84,13 +90,13 @@ class scraperToDataConnection:
         buildString += f"\tdatabasename: {self.databaseName}\n"
         buildString += f"\tdebugFeedback: {self.debugFeedback}\n"
         buildString += "Summary:\n"
-        if self.databaseConnection != None: 
+        if self.databaseConnection is not None: 
             buildString += f"Connected to Database: {self.databaseName}: {self.databaseConnection.is_connected()}\n"
         else:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
         return buildString
 
-    def __connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
+    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
         """ This function attempts to the connect to the sql sever based on the input parameters
 
         Args:
@@ -103,13 +109,16 @@ class scraperToDataConnection:
             bool: True if sql database was successfully connected, False if not connected
         """
         try:
+            # conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             conn = mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
             
-            if self.debugFeedback: print(f"Database: {self.databaseName} successfully connected")
+            if self.debugFeedback: 
+                print(f"Database: {self.databaseName} successfully connected")
             return conn
         
         except Exception as error:
-            if self.debugFeedback: print(error)
+            if self.debugFeedback:
+                print(error)
             raise ConnectionError   # table could not be connected to
 
     def tableExists(self, tablename:str=tablename) -> bool:
@@ -126,7 +135,8 @@ class scraperToDataConnection:
         # {tablename}
         result = self.cursor.fetchone()[0] == 1  # check if table exists
         
-        if self.debugFeedback: print(f"{self.databaseName} existence={result}")
+        if self.debugFeedback: 
+            print(f"{self.databaseName} existence={result}")
         
         return result                   # return result of if table exists
     
@@ -182,18 +192,22 @@ class scraperToDataConnection:
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0
                 ]
+                
+                if len(job["url"]) > 2083: 
+                    raise mysql.connector.errors.DataError
             
                 # Calculate and set salary
                 if 'salary' in job and isinstance(job['salary'], str):
                     salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])
                     if len(salaries) > 0:
-                        salary = round(sum(int(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
+                        salary = round(sum(int(val[1:].replace(",", "").split('.')[0]) for val in salaries) / len(salaries), 2)
                         values[5] = salary  # Set calculated salary
             
                 self.cursor.execute(query, tuple(values))
                 self.databaseConnection.commit()
             except mysql.connector.IntegrityError as error:
-                if self.debugFeedback: print(error)
+                if self.debugFeedback: 
+                    print(error)
                 if str(error)[:4] != "1062":
                     raise
 
