@@ -4,3 +4,4 @@ mysql-connector-python
 pytest
 pytest-cov
 requests
+mock

@@ -16,6 +16,8 @@
 import pytest                               # testing module
 import mysql.connector                      # sql
 from scraperToData import scraperToDataConnection      # scraperToDataConnection class
+from mock import MagicMock
+
 
 # tests:
 # these functions don't have any naming restrictions from pytest
