@@ -5,7 +5,7 @@ import mysql.connector
 from bs4 import BeautifulSoup
 
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
-time.sleep(60)
+# time.sleep(60)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 3
 SCROLL_PAUSE_TIME = 2.5
@@ -31,7 +31,7 @@ globalJobData = []
 #
 # scraping indeed here runs much faster than scraping linkedIn
 
-def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
+def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:str = "selenium") -> None:
     """ Scrapes indeed Website and saves found jobs to jobData. Could not find field data but instead got company, 
     posting date, remoteness, salary, company, and description.
 
@@ -39,6 +39,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         numPages (int): number of pages to scrape from indeed
         jobData (list): list of dictionaries that this function will fill
         limit (int): sets a limit for the number of job listings that will be scraped. If Below 0, will scrape with no limit. Defaults to -1.
+        serverHostname (str): specifies the hostname of the server that the remote driver will execute on.
 
     Raises:
         ValueError: Input parameter to function was incorrect
@@ -64,7 +65,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         
         # init driver
         # driver should be init within this loop so indeed doesn't stop scraping
-        serverURL = "http://selenium:4444/wd/hub"
+        serverURL = "http://"+serverHostname+":4444/wd/hub" #selenium
         # init driver
         options = webdriver.ChromeOptions()
         options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
@@ -299,7 +300,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
     
 
 
-def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
+def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:str = "selenium") -> None:
     """ Scrapes linkedin Website and saves found jobs to jobData
 
     Args:
@@ -320,7 +321,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         raise ValueError("Parameters not allowing scraping")
     linkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
     
-    serverURL = "http://selenium:4444/wd/hub"
+    serverURL = "http://"+serverHostname+":4444/wd/hub"
     # init driver
     options = webdriver.ChromeOptions()
     options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
@@ -400,11 +401,11 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     finally:
         driver.quit()
 
-jobDict = []
-scrapeIndeed(1, jobDict, jobLimit=10)
+# jobDict = []
+# scrapeIndeed(1, jobDict, jobLimit=10)
 
-for element in jobDict:
-    print(element['title'])
+# for element in jobDict:
+#     print(element['title'])
 
 #     # db = mysql.connector.connect(
 # host="mysql",  # Updated to the new host
@@ -414,9 +415,9 @@ for element in jobDict:
 # # )
 # print('Entering Job Data...')
 
-connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
-print("connected to db")
-connection.addJobData(jobDict)
+# connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
+# print("connected to db")
+# connection.addJobData(jobDict)
 
 # print('Job Data Entered')
 # mycursor = db.cursor()
