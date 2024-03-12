@@ -14,7 +14,7 @@ COPY settings.gradle .
 RUN chmod +x ./gradlew
 
 # Use the Gradle wrapper to ensure the project is properly set up
-RUN ./gradlew wrapper
+# RUN ./gradlew wrapper
 
 # Copy the project source
 COPY src src

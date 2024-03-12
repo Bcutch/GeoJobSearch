@@ -5,4 +5,4 @@ pytest
 pytest-cov
 requests
 pylint
-
+mock

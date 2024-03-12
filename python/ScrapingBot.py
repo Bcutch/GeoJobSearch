@@ -1,12 +1,12 @@
-import time, json, re
+import time
+import json
+import re
 from selenium import webdriver
-from scraperToData import scraperToDataConnection
-import mysql.connector
 from bs4 import BeautifulSoup
 import os
 
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
-time.sleep(60)
+# time.sleep(60)
 # Variable That Gets Number Of Pages Scraped
 scrapedPages = 3
 SCROLL_PAUSE_TIME = 2.5
@@ -32,7 +32,7 @@ globalJobData = []
 #
 # scraping indeed here runs much faster than scraping linkedIn
 
-def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
+def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:str = "selenium") -> None:
     """ Scrapes indeed Website and saves found jobs to jobData. Could not find field data but instead got company, 
     posting date, remoteness, salary, company, and description.
 
@@ -40,12 +40,14 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         numPages (int): number of pages to scrape from indeed
         jobData (list): list of dictionaries that this function will fill
         limit (int): sets a limit for the number of job listings that will be scraped. If Below 0, will scrape with no limit. Defaults to -1.
+        serverHostname (str): specifies the hostname of the server that the remote driver will execute on.
 
     Raises:
         ValueError: Input parameter to function was incorrect
     """
     
-    if type(jobData) != list: raise ValueError("jobData type not a list")
+    if isinstance(jobData, list): 
+        raise ValueError("jobData type not a list")
     if numPages <= 0 or jobLimit == 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
         raise ValueError("Parameters not allowing scraping")
     
@@ -65,7 +67,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         
         # init driver
         # driver should be init within this loop so indeed doesn't stop scraping
-        serverURL = os.environ.get('SELENIUM_SERVER_URL', "http://localhost:4444/wd/hub")
+        serverURL = "http://"+serverHostname+":4444/wd/hub" #selenium
         # init driver
         options = webdriver.ChromeOptions()
         options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
@@ -89,32 +91,38 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
             jobSoup = BeautifulSoup(driver.page_source, 'html.parser') # Creates a new soup "Driver" for current page to parse through
             
             header = jobSoup.find('h1', class_="jobsearch-JobInfoHeader-title")
-            if header != None: title = header.find('span').text # Code to get job title for given url
+            if header is not None: 
+                title = header.find('span').text # Code to get job title for given url
             
             # location
             location = jobSoup.find('div', class_='css-1ikmi61 eu4oa1w0')
-            if location != None: location = location.text
+            if location is not None: 
+                location = location.text
             
             # company
             company = jobSoup.find('div', class_='css-141snrz eu4oa1w0')
-            if company != None: company = company.text
+            if company is not None: 
+                company = company.text
             
             # get additional info
             additional = jobSoup.find('div', id="salaryInfoAndJobType")
             salary = None
             jobType = None
-            if additional != None:
+            if additional is not None:
             # print(insights)
                 salary = additional.find('span', class_="css-19j1a75 eu4oa1w0")
-                if salary != None: salary = salary.text
+                if salary is not None: 
+                    salary = salary.text
                 jobType = additional.find('span', class_="css-k5flys eu4oa1w0")
-                if jobType != None: jobType = jobType.text
-                if jobType != None and jobType[:4] == ' -  ': jobType = jobType[4:]
+                if jobType is not None: 
+                    jobType = jobType.text
+                if jobType is not None and jobType[:4] == ' -  ': 
+                    jobType = jobType[4:]
             
             jobPostingDict = jobSoup.find('script', type="application/ld+json")
             
             postingdate = None
-            if jobPostingDict != None:
+            if jobPostingDict is not None:
                 jobPostingDict = json.loads(jobPostingDict.text)
                 # convert to format yyyy-mm-dd
                 postingdate = (jobPostingDict['datePosted'][0]+jobPostingDict['datePosted'][1] + jobPostingDict['datePosted'][2]+jobPostingDict['datePosted'][3] + '-'
@@ -126,7 +134,8 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1) -> None:
             
             #remoteness
             remote = jobSoup.find('div', 'css-6z8o9s eu4oa1w0')
-            if remote != None: remote = remote.text
+            if remote is not None: 
+                remote = remote.text
             remoteBool = not (remote == '')
 
             # add data to list
@@ -200,7 +209,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
     # variables
     soup = None             # final return variable to return soup
     _options = options
-    if _options == None:                    # set options if none exist
+    if _options is None:                    # set options if none exist
         _options = webdriver.ChromeOptions()
         _options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
     maxTimeoutAttempts = 10        # number of attempts to be made before a timeout error is raised
@@ -222,7 +231,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
             last_height = 0 
             try:
                 last_height = driver.execute_script("return document.body.scrollHeight")
-            except Exception as error:  # failed to scroll
+            except Exception:  # failed to scroll
                 # no scroll height
                 last_height = -1
                 raise ConnectionError("Failed to get last_height")
@@ -247,7 +256,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
         #
         #   loop until a not auth_wall page is found
         #
-        while (pageKey != None and pageKey[:len(authWallPrefix)] == authWallPrefix) or pageKey == None:    
+        while (pageKey is not None and pageKey[:len(authWallPrefix)] == authWallPrefix) or pageKey is None:    
             # if timeout, raise error
             if timeoutAttempts >= maxTimeoutAttempts:
                 raise TimeoutError(f"Max timeouts attempts ({timeoutAttempts} of {maxTimeoutAttempts}) reached searching LinkedIn")
@@ -255,21 +264,24 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
                 
             # get page
             soup = BeautifulSoup(driver.page_source, 'html.parser')
-            if soup == None: raise ConnectionError("Could not find Soup for linkedIn")    # page not found
+            if soup is None: 
+                raise ConnectionError("Could not find Soup for linkedIn")    # page not found
 
             # get page header info
             meta = soup.find('meta')
             pageKey = None
-            if meta != None: pageKey = meta.get("content")
+            if meta is not None: 
+                pageKey = meta.get("content")
             
             # check for net error
             netError = soup.find('body', class_='neterror')     # if class is net error
             # check for load error
             bodyError = soup.find('body')      
-            if bodyError != None: bodyError = str(bodyError) == "<body></body>"     # if body is empty
+            if bodyError is not None: 
+                bodyError = str(bodyError) == "<body></body>"     # if body is empty
 
             # if net error or load error
-            if netError != None or bodyError == True: 
+            if netError is not None or bodyError is True: 
                 #  reload driver
                 driver.quit()
                 driver = None
@@ -284,7 +296,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
                 
 
             # continue until no auth_wall or timeout
-            if pageKey != None and pageKey[:len(authWallPrefix)] == authWallPrefix:
+            if pageKey is not None and pageKey[:len(authWallPrefix)] == authWallPrefix:
                 driver.get(url)
                 time.sleep(sleepSecondsAuth)
     
@@ -300,7 +312,7 @@ def getSoupforLinkedIn(url:str, driver:webdriver.Chrome, options:webdriver.Chrom
     
 
 
-def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
+def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:str = "selenium") -> None:
     """ Scrapes linkedin Website and saves found jobs to jobData
 
     Args:
@@ -315,13 +327,14 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
         ValueError: Input parameter to function was incorrect
 
     """
-    if type(jobData) != list: raise ValueError("jobData type not a list")
+    if isinstance(jobData, list) is False: 
+        raise ValueError("jobData type not a list")
     
     if numPages <= 0 or jobLimit == 0:   # should only scrape web if asked to scrap a positive non-zero number of pages
         raise ValueError("Parameters not allowing scraping")
     linkedInUrl="https://www.linkedin.com/jobs/search?position=1&pageNum=0"
     
-    serverURL = os.environ.get('SELENIUM_SERVER_URL', "http://localhost:4444/wd/hub")
+    serverURL = "http://"+serverHostname+":4444/wd/hub"
     # init driver
     options = webdriver.ChromeOptions()
     options.add_argument('log-level=3')     # only allows fatal errors to appear, prevents needless spam
@@ -335,18 +348,20 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     # Open URL and wait for everything to load
         
     soup = getSoupforLinkedIn(url=linkedInUrl, driver=driver, options=options, numPages=numPages)
-    if soup == None: raise ConnectionError("Could not get any info for linkedIn")
+    if soup is None: 
+        raise ConnectionError("Could not get any info for linkedIn")
     
     jobCount = 0
     try:
         # Loop to find all reference tags
         for jobListing in soup.find_all('div', class_='base-card'):
-            if jobListing == None: raise ModuleNotFoundError("jobListing should have been found")
+            if jobListing is None: 
+                raise ModuleNotFoundError("jobListing should have been found")
             url = jobListing.find('a', class_='base-card__full-link').get('href')
             
             # get soup for more details info
             detailsSoup = getSoupforLinkedIn(url=url, options=options, driver=driver)
-            if detailsSoup == None: 
+            if detailsSoup is None: 
                 driver.quit()
                 return jobData
             
@@ -359,7 +374,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
             # open details from job page to get more info
             coreInfo     = detailsSoup.find_all('li', class_="description__job-criteria-item")
             description  = detailsSoup.find('div', 'show-more-less-html__markup')
-            if description != None:
+            if description is not None:
                 description = str(description.text)
             else:
                 description = None
@@ -378,7 +393,7 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
                     seniority = str(element.find('span', class_ = 'description__job-criteria-text').text.strip())
             
             salary = detailsSoup.find('div', class_='salary')
-            if salary != None: 
+            if salary is not None: 
                 salary = str(salary.text)
             else:
                 salary = None
@@ -401,11 +416,11 @@ def scrapeLinkedIn(numPages:int, jobData:list, jobLimit:int = -1) -> None:
     finally:
         driver.quit()
 
-jobDict = []
-scrapeIndeed(1, jobDict, jobLimit=10)
+# jobDict = []
+# scrapeIndeed(1, jobDict, jobLimit=10)
 
-for element in jobDict:
-    print(element['title'])
+# for element in jobDict:
+#     print(element['title'])
 
 #     # db = mysql.connector.connect(
 # host="mysql",  # Updated to the new host
@@ -415,9 +430,9 @@ for element in jobDict:
 # # )
 # print('Entering Job Data...')
 
-connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
-print("connected to db")
-connection.addJobData(jobDict)
+# connection = scraperToDataConnection(host="mysql", user="root", passwd="pwd", databaseName="template_db")
+# print("connected to db")
+# connection.addJobData(jobDict)
 
 # print('Job Data Entered')
 # mycursor = db.cursor()
