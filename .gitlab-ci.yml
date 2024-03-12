@@ -40,7 +40,6 @@ spring_analysis:
   script:
     - cd spring
     - ./gradlew test
-
   artifacts:
     paths:
       - spring/build/jacoco/index.html
@@ -51,5 +50,7 @@ python_analysis:
   script:
     - cd python
     - pip install -r requirements.txt
+    - export PYTHONPATH=./
     - pylint ./ || true
-    - pytest
+    - pytest test_scrapingBot.py --cov
+    - pytest test_scraperToData.py --cov
