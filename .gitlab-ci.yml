@@ -47,6 +47,9 @@ spring_analysis:
 python_analysis:
   stage: python_analysis
   image: python:3.11
+  before_script:
+    - apt-get update && apt-get install -y openjdk-11-jre
+    - java -version
   script:
     - cd python
     - pip install -r requirements.txt
