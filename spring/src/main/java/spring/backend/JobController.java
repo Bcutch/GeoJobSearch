@@ -20,13 +20,11 @@ public class JobController {
 
     @GetMapping("/jobs")
     public List<Job> getAllJobs() {
-        System.out.println("receivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceivedreceived");
         return jobRepository.findAll();
     }
 
     @PutMapping("/jobs")
     public List<Job> filterJobs(@RequestBody FilterOptions filterOptions) { //Takes JSON data from request and puts it into filterOptions object
-        System.out.println("received-------------------------------------------------------------------------");
         if (filterOptions.getJobType() != "JobType") {
             if (filterOptions.getJobType() == "Full-time") {
                 return jobRepository.findAll();

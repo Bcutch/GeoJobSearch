@@ -8,15 +8,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "filterOptions")
+@Table
 public class FilterOptions {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
 
-    private String jobType = "JobType";
+    private String jobType = "Job Type";
     private String remote = "Remoteness";
     private String salary = "Salary";
     private String distance = "Distance";
+
+    public FilterOptions() {
+        
+    }
+
+    public FilterOptions(String jobTypes, String remotes, String salarys, String distances) {
+        jobType = jobTypes;
+        remote = remotes;
+        salary = salarys;
+        distance = distances;
+    }
 
     // Getters
     public String getJobType() {
