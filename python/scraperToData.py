@@ -1,4 +1,5 @@
 import mysql.connector
+from mysql.connector.connection import MySQLConnection
 import re
     
 # can be tested by running:
@@ -96,7 +97,7 @@ class scraperToDataConnection:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
         return buildString
 
-    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
+    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> MySQLConnection:
         """ This function attempts to the connect to the sql sever based on the input parameters
 
         Args:
