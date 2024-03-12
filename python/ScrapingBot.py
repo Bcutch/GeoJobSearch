@@ -3,6 +3,7 @@ import json
 import re
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import os
 
 # Sleep for 1 Minute So That Python doesn't try to connect to the selenium server before it is established
 # time.sleep(60)

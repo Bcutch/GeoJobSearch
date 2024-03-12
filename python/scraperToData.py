@@ -1,4 +1,5 @@
 import mysql.connector
+from mysql.connector.connection import MySQLConnection
 import re
     
 # can be tested by running:
@@ -96,7 +97,7 @@ class scraperToDataConnection:
             buildString += f"Connected to Database: {self.databaseName}: False\n"
         return buildString
 
-    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> mysql.connector.connection_cext.CMySQLConnection:
+    def connectDatabase(self, host:str, user:str, passwd:str, database:str) -> MySQLConnection:
         """ This function attempts to the connect to the sql sever based on the input parameters
 
         Args:
@@ -200,7 +201,7 @@ class scraperToDataConnection:
                 if 'salary' in job and isinstance(job['salary'], str):
                     salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])
                     if len(salaries) > 0:
-                        salary = round(sum(int(val[1:].replace(",", "").split('.')[0]) for val in salaries) / len(salaries), 2)
+                        salary = round(sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
                         values[5] = salary  # Set calculated salary
             
                 self.cursor.execute(query, tuple(values))

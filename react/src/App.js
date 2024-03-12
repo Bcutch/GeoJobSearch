@@ -1,3 +1,4 @@
+import React from "react";
 import DisplayJobs from "./components/DisplayJobs";
 import Filtering from "./components/Filtering";
 import NavigationBar from "./components/NavigationBar";
