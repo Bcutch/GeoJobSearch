@@ -19,3 +19,36 @@ def getSavedJobListings() -> list:
     with open(jobListingsPath, "r") as fp:
         jobData = json.load(fp)
     return jobData
+
+def getSavedJobsIndeed():
+    """returns joblistings sorted for indeed
+
+    Returns:
+        indeedJobListings, linkedInJobListings
+    """
+    indeedJobListings = []
+    
+    listings = getSavedJobListings()
+    for job in listings:
+        if job["url"][int(len("https://")):].split('/')[0] == "ca.indeed.com":
+            # add job to indeed
+            indeedJobListings.append(job)
+            
+    return indeedJobListings
+    
+    
+def getSavedJobsLinkedIn():
+    """returns joblistings sorted for linkedin
+
+    Returns:
+        linkedInJobListings
+    """
+    linkedInJobListings = []
+    
+    listings = getSavedJobListings()
+    for job in listings:
+        if job["url"][int(len("https://")):].split('/')[0] == "www.linkedin.com":
+            # add job to linkedin
+            linkedInJobListings.append(job)
+            
+    return linkedInJobListings

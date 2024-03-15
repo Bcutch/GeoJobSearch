@@ -1,19 +1,19 @@
+import React from "react";
 import DisplayJobs from "./components/DisplayJobs";
 import Filtering from "./components/Filtering";
 import NavigationBar from "./components/NavigationBar";
 import Search from "./components/Search";
-import React, { useState, useEffect } from "react";
+import Map from "./components/Map"
 
 function App() {
-  const [jobs, setJobs] = useState([]);
-
   return (
     <div>
       <NavigationBar />
+      <Map />
       <main>
         <Search />
-        <Filtering setJobs={setJobs}/>
-        <DisplayJobs /*jobs={jobs} setJobs={setJobs}*//>
+        <Filtering />
+        <DisplayJobs />
       </main>
     </div>
   );

@@ -2,7 +2,9 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'pmd'
 	id 'jacoco'
+
 }
 
 group = 'spring'
@@ -10,6 +12,12 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
+}
+
+pmd {
+    toolVersion = '6.37.0'
+    ignoreFailures = true
+    ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
 
 jacoco {
@@ -34,17 +42,16 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-
 test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
-	
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
+    dependsOn test
     reports {
         xml.required = false
         csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        html.outputLocation = layout.buildDirectory.dir('jacoco')
     }
 }
 
