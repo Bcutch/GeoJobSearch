@@ -179,7 +179,7 @@ class scraperToDataConnection:
         Adds this data to the job sql table
 
         Returns:
-            int: Returns number of jobs added
+            int: Returns number of jobs added. This can be used to determine the percent of jobs that were successfully added.
         """
         if isinstance(jobData, dict):
             jobData = [jobData]
@@ -233,7 +233,7 @@ class scraperToDataConnection:
                 self.cursor.execute(query, tuple(values))
                 self.databaseConnection.commit()
                 
-                totalJobsAdded += 1
+                totalJobsAdded += 1 # counts number of jobs added
                 
             except mysql.connector.IntegrityError as error:
                 if self.debugFeedback: 
@@ -243,7 +243,7 @@ class scraperToDataConnection:
             except TypeError as error:
                 print(f"WARNING in {__name__} in addJobData:", error)
                 continue
-
+            
         return totalJobsAdded
 
     def jobUrlExists(self, jobEntry:dict):
@@ -256,6 +256,7 @@ class scraperToDataConnection:
                 # job entry url shouldn't be none
                 return False
             
+            # count number of occurances of url parameter
             self.cursor.execute(f"""
                         SELECT a.c FROM 
                         (SELECT url, COUNT(*) c 
@@ -264,7 +265,7 @@ class scraperToDataConnection:
                         """)
 
             result = self.cursor.fetchone()
-            return result is not None
+            return result is not None   # if number of occurances is None, url doesnt exist
         
         except TypeError as e:
             # there must've been something wrong with the inputs

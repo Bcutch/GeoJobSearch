@@ -16,7 +16,7 @@
 
 # imports:
 import pytest                               # testing module
-import mysql.connector                      # sql
+# import mysql.connector                      # sql
 from .scraperToData import scraperToDataConnection      # scraperToDataConnection class
 from mock import MagicMock
 
