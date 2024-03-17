@@ -7,19 +7,19 @@ from geopy.geocoders import Nominatim
 # pytest python/test_scraperToData.py
 
 
-host = "mysql"                  # was "host"
-user = "root"                   # was "root"
-passwd = "pwd"                  # was "root"
-databaseName = "template_db"    # was "testdb"
-# host = "localhost"
-# user = "root"
-# passwd = "root"
-# databaseName = "testdb"
-tablename = "job"
+globalHost = "mysql"                  # was "host"
+globalUser = "root"                   # was "root"
+globalPasswd = "pwd"                  # was "root"
+globalDatabaseName = "template_db"    # was "testdb"
+# globalHost = "localhost"
+# globalUser = "root"
+# globalPasswd = "root"
+# globalDatabaseName = "testdb"
+globalTablename = "job"
 
 
 class scraperToDataConnection:
-    def __init__(self, host:str=host, user:str=user, passwd:str=passwd, databaseName:str=databaseName, tablename:str=tablename, 
+    def __init__(self, host:str=globalHost, user:str=globalUser, passwd:str=globalPasswd, databaseName:str=globalDatabaseName, tablename:str=globalTablename, 
                  dropTable:bool=False, debugFeedback:bool=False, autoConnect:bool=True) -> None:
         """ Summary:
             Creates a connection within the class for a continous connection to the database.
@@ -54,7 +54,7 @@ class scraperToDataConnection:
             self.cursor = self.databaseConnection.cursor()     # init cursor
         
         # create table if not exists
-        if self.dropTable and self.tableExists('job'):
+        if self.dropTable and self.tableExists(self.tablename):
             self.cursor.execute("DROP TABLE job")     # WARNING: DELETES TABLE TO RESET FOR TESTING PURPOSES
         if autoConnect:
             self.createJobTable()
@@ -123,7 +123,7 @@ class scraperToDataConnection:
                 print(error)
             raise ConnectionError   # table could not be connected to
 
-    def tableExists(self, tablename:str=tablename) -> bool:
+    def tableExists(self, tablename:str=globalTablename) -> bool:
         """ Checks if table exists in current schema.
             
         Returns:
@@ -155,6 +155,8 @@ class scraperToDataConnection:
     def createJobTable(self) -> None: 
         """ Creates sql table named job
         """
+        if self.databaseName is None:
+            raise ConnectionError(f"Aborted Connected. Attempted to create a table where databaseName={self.databaseName}")
         # had to decrease URL size from 2000 down to 768 to use url's as a
         # unique to to prevent duplicate entries
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS job (
@@ -172,14 +174,24 @@ class scraperToDataConnection:
         );""")
         
     
-    def addJobData(self, jobData:list) -> bool:
+    def addJobData(self, jobData:list) -> int:
         """Adds data from a list in the format: [{dict}, {dict}, {dict}...]. 
-    Adds this data to the job sql table
+        Adds this data to the job sql table
 
-    Returns:
-        bool: Returns True if added the data successfully
-    """
+        Returns:
+            int: Returns number of jobs added
+        """
+        if isinstance(jobData, dict):
+            jobData = [jobData]
+        
+        totalJobsAdded = 0
+
         for job in jobData:
+            if self.jobUrlExists(jobEntry=job) is True:
+                # if job url already exists in database, skip job
+                print("WARNING: Duplicate Entry Attempted")
+                continue
+            
             try:
                 query = """INSERT INTO job
                            (title, company, location, description, url, salary, field, is_remote, longitude, latitude)
@@ -220,14 +232,44 @@ class scraperToDataConnection:
 
                 self.cursor.execute(query, tuple(values))
                 self.databaseConnection.commit()
+                
+                totalJobsAdded += 1
+                
             except mysql.connector.IntegrityError as error:
                 if self.debugFeedback: 
                     print(error)
                 if str(error)[:4] != "1062":
                     raise
+            except TypeError as error:
+                print(f"WARNING in {__name__} in addJobData:", error)
+                continue
 
-        return True
+        return totalJobsAdded
 
+    def jobUrlExists(self, jobEntry:dict):
+        # if list attempt to change to dict
+        if isinstance(jobEntry, list):
+            jobEntry = jobEntry[0]
+            
+        try:
+            if jobEntry['url'] is None:
+                # job entry url shouldn't be none
+                return False
+            
+            self.cursor.execute(f"""
+                        SELECT a.c FROM 
+                        (SELECT url, COUNT(*) c 
+                        FROM job GROUP BY url) as a 
+                        WHERE a.url = '{jobEntry['url']}'; 
+                        """)
+
+            result = self.cursor.fetchone()
+            return result is not None
+        
+        except TypeError as e:
+            # there must've been something wrong with the inputs
+            print(f"WARNING in {__name__} in jobUrlExists:", e)
+            return False
         
 
 # # I made this before I realized we wouldn't be accessing the database like this

@@ -10,12 +10,14 @@
 # or for coverage reports:
 # pytest python/test_scraperToData.py --cov
 # --------------------------------------------------------
+# IF NOT EXISTS (SELECT user_id, text from users where user_id = @user_id AND text = @text) BEGIN
+#    INSERT INTO users ....
 
 
 # imports:
 import pytest                               # testing module
 import mysql.connector                      # sql
-from scraperToData import scraperToDataConnection      # scraperToDataConnection class
+from .scraperToData import scraperToDataConnection      # scraperToDataConnection class
 from mock import MagicMock
 
 
@@ -79,7 +81,7 @@ def testImproperPasswd(improperPasswd):
         scraperToDataConnection(passwd=improperPasswd)
 
 @pytest.mark.parametrize("improperdatabaseName", 
-    [("a sentance"), (25), (None)]
+    [("a sentance"), (25), (None,)]
 )   
 def testImproperdatabaseName(improperdatabaseName):
     with pytest.raises(ConnectionError):
@@ -115,10 +117,11 @@ def testAddCorruptData(mockDatabase):
     with pytest.raises(KeyError):
         mockDatabase.addJobData(badData)
 
+
 def testAddMultipleData(mockDatabase):
     data = [{   # this is fake data that will be inserted into the table and also removed
         'title':fakeDataTitle,
-        'url':'THIS_IS_FAKE_DATA',
+        'url':'THIS_IS_CORRECT_FAKE_DATA',
         'company': 'Shark Hunters',
         'location': "Atlantis",
         'postingdate': "3020-12-31",
@@ -127,8 +130,29 @@ def testAddMultipleData(mockDatabase):
         'salary': "$200,000 - $300,000 per year",
         'seniority': "High-level",
         'description': "The \tcraziest job you'll ever see!!\n\n."
-        }]
-    assert mockDatabase.addJobData(data) is True     # we will add this same data multiple times to check for duplicates
+        },
+        {'title':fakeDataTitle,
+            'url':'THIS_IS_CORRECT_FAKE_DATA',
+            'company': 'Shark Hunters'},
+        {'title':fakeDataTitle,
+            'url':'THIS_IS_MORE_FAKE_DATA',
+            'company': 'Shark Hunters'},
+        {'title':fakeDataTitle,
+            'url':'THIS_IS_MORE_FAKE_DATA',
+            'company': 'Shark Hunters'},
+        {'title':fakeDataTitle,
+            'url':None,
+            'company': 'Shark Hunters'}, 
+        {'title':fakeDataTitle,
+            'url':None,
+            'company': 'Shark Hunters'},
+        ["mydatabase","a url"], 
+        25, 
+        None]
+    return_values = [None, 1, None, 1, None, None, None, None, None]
+    mockDatabase.cursor.fetchone.side_effect = return_values
+
+    assert mockDatabase.addJobData(data) == 2     # we will add this same data multiple times to check for duplicates
     
     
 def testLongUrlLength(mockDatabase):
@@ -138,8 +162,7 @@ def testLongUrlLength(mockDatabase):
         'url':string
         }]
     
-    with pytest.raises(mysql.connector.DataError):
-        mockDatabase.addJobData(data)                 # should not be able to add a value longer than the allowed length
+    mockDatabase.addJobData(data) == 0                 # should not be able to add a value longer than the allowed length
 
     
 def testNoTitle(mockDatabase): # title value MUST exist, if not an error should be raised
@@ -147,8 +170,7 @@ def testNoTitle(mockDatabase): # title value MUST exist, if not an error should 
         'url':'THIS_IS_FAKE_DATA'
         }]
     
-    with pytest.raises(KeyError):
-        mockDatabase.addJobData(data)
+    mockDatabase.addJobData(data) == 0
     
     
     
@@ -169,8 +191,7 @@ def testAddWrongRemoteValue(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'remote': "Hybrid"              # should be a bool, not string
         }]
-    with pytest.raises(ValueError):
-        mockDatabase.addJobData(remoteData)
+    mockDatabase.addJobData(remoteData) == 0
     
 
 def testAddCorrectRemoteValue(mockDatabase):
@@ -181,7 +202,12 @@ def testAddCorrectRemoteValue(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'remote': False              # should be a bool, not string
         }]
-    assert mockDatabase.addJobData(remoteData) is True
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": None
+        }
+    )
+    assert mockDatabase.addJobData(remoteData) == 1
     
     
 def testHandleExtraData(mockDatabase):
@@ -193,7 +219,12 @@ def testHandleExtraData(mockDatabase):
         'cat': 'yes',
         'dog': 'no'
         }]
-    assert mockDatabase.addJobData(extraData) is True            # should raise no errors
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": None
+        }
+    )
+    assert mockDatabase.addJobData(extraData) == 1            # should raise no errors
     
     
 def testAddCorrectSalary(mockDatabase):
@@ -203,7 +234,12 @@ def testAddCorrectSalary(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'salary': 'around $150,000 per year'
         }]
-    assert mockDatabase.addJobData(data) is True           # should raise no errors
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": None
+        }
+    )
+    assert mockDatabase.addJobData(data) == 1           # should raise no errors
 
     
 def testAddNumericSalary(mockDatabase):
@@ -213,8 +249,49 @@ def testAddNumericSalary(mockDatabase):
         'url':'THIS_IS_FAKE_DATA',
         'salary': 150_000
         }]
-    assert mockDatabase.addJobData(data) is True            # should raise no errors
-    
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": None
+        }
+    )
+    assert mockDatabase.addJobData(data) == 1            # should raise no errors
+
+
+@pytest.mark.parametrize("jobEntry, expected, result", 
+    [({   # this is fake data that will be inserted into the table and also removed
+        'title':fakeDataTitle,
+        'url':'THIS_IS_CORRECT_FAKE_DATA',
+        'company': 'Shark Hunters',
+        'location': "Atlantis",
+        'postingdate': "3020-12-31",
+        'jobType': "Full-Time",
+        'field': "Fishing",
+        'salary': "$200,000 - $300,000 per year",
+        'seniority': "High-level",
+        'description': "The \tcraziest job you'll ever see!!\n\n."
+        }, False, None),
+    ({'url':'THIS_IS_CORRECT_FAKE_DATA',
+        'company': 'Shark Hunters'}, True, 1),
+    ({'url':'THIS_IS_MORE_FAKE_DATA',
+        'company': 'Shark Hunters'}, True, 6),
+    ({'title':fakeDataTitle,
+        'url':None,
+        'company': 'Shark Hunters'}, False, None), 
+    ({'title':fakeDataTitle,
+        'url':None,
+        'company': 'Shark Hunters'}, False, None), 
+    (["mydatabase","a url"], False, None), 
+    (25, False, None), 
+    (None, False, None)]
+)
+def testJobEntryExists(mockDatabase, jobEntry, expected, result):
+    # checks that if a job already exists in the database, it will be found
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": result
+        }
+    )
+    assert mockDatabase.jobUrlExists(jobEntry) is expected 
     
 # # I made this before I realized we wouldn't be accessing the database like this
 # # Incase it needs to be implemented its here but I'm assuming we won't need it
