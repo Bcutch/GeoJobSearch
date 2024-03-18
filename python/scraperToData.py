@@ -206,7 +206,7 @@ class scraperToDataConnection:
                         values[5] = salary  # Set calculated salary
                 
                 # Use the Geopy library to get the longitude and latitude as long as a job has a location
-                if job['location'] != None:
+                if 'location' in job and job['location'] is not None:
                     loc = Nominatim(user_agent="Geopy Library")
                     getLoc = loc.geocode(job['location'])
                     if getLoc != None: # Only set longitude and Latitude if a valid value is found for given location
