@@ -187,7 +187,7 @@ class scraperToDataConnection:
         totalJobsAdded = 0
 
         for job in jobData:
-            if self.jobUrlExists(jobEntry=job) is True:
+            if self.jobExists(jobEntry=job) is True:
                 # if job url already exists in database, skip job
                 print("WARNING: Duplicate Entry Attempted")
                 continue
@@ -261,7 +261,7 @@ class scraperToDataConnection:
             
         return totalJobsAdded
 
-    def jobUrlExists(self, jobEntry:dict):
+    def jobExists(self, jobEntry:dict):
         # if list attempt to change to dict
         if isinstance(jobEntry, list):
             jobEntry = jobEntry[0]

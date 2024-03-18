@@ -296,7 +296,7 @@ def testJobEntryExists(mockDatabase, jobEntry, expected, result):
             "fetchone.return_value": result
         }
     )
-    assert mockDatabase.jobUrlExists(jobEntry) is expected 
+    assert mockDatabase.jobExists(jobEntry) is expected 
     
 # # I made this before I realized we wouldn't be accessing the database like this
 # # Incase it needs to be implemented its here but I'm assuming we won't need it
