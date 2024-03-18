@@ -7,14 +7,14 @@ from geopy.geocoders import Nominatim
 # pytest python/test_scraperToData.py
 
 
-# globalHost = "mysql"                  # was "host"
-# globalUser = "root"                   # was "root"
-# globalPasswd = "pwd"                  # was "root"
-# globalDatabaseName = "template_db"    # was "testdb"
-globalHost = "localhost"
-globalUser = "root"
-globalPasswd = "root"
-globalDatabaseName = "testdb"
+globalHost = "mysql"                  # was "host"
+globalUser = "root"                   # was "root"
+globalPasswd = "pwd"                  # was "root"
+globalDatabaseName = "template_db"    # was "testdb"
+# globalHost = "localhost"
+# globalUser = "root"
+# globalPasswd = "root"
+# globalDatabaseName = "testdb"
 globalTablename = "job"
 
 
@@ -276,7 +276,11 @@ class scraperToDataConnection:
                         SELECT COUNT(*)
                         FROM job 
                         WHERE url = '{jobEntry['url']}'
-                        AND title = '{jobEntry['title']}'; 
+                        OR (
+                            title = '{jobEntry['title']}'
+                            AND company {f"= '{jobEntry.get('company')}'" if jobEntry.get('company') is not None else "is NULL"}
+                            AND location {f"= '{jobEntry.get('location')}'" if jobEntry.get('location') is not None else "is NULL"}
+                            );
                         """)
 
             count = self.cursor.fetchone()[0]
