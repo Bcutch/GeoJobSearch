@@ -1,3 +1,3 @@
 cd /python
-echo "Execute scraper session"
+echo execute scraper session
 /usr/bin/python main.py

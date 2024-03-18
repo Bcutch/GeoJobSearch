@@ -1,6 +1,6 @@
 python main.py
 
-mv /python/run-scraper /etc/cron.d/main-cron
+mv /python/main-cron /etc/cron.d/main-cron
 chmod 0644 /etc/cron.d/main-cron
 crontab /etc/cron.d/main-cron
 touch /var/log/cron.log

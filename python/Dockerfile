@@ -11,5 +11,5 @@ RUN apt-get update && apt-get install -y cron
 
 COPY . .
 
-CMD ["bash", "setup-cron.sh"]
+CMD ["bash", "create-cron.sh"]
 
