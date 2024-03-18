@@ -14,7 +14,8 @@ export default function Map() {
 
 
     return (
-        <>
+        <> 
+            {/* Create A Map Container Component, This is the basis for our dynamic map */}
             <MapContainer center={[43.5448,-80.2482]} zoom={14} style={{ height: '500px', width: '100%' }}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -24,6 +25,7 @@ export default function Map() {
                     zoomOffset={-1}
                     accessToken="pk.eyJ1IjoibmVkYXNraWJpbGRpcyIsImEiOiJjbHRqMmMyNXQwbGwzMm1wNWlkbHh5ZXBrIn0.Bb5m8mQ0V7sfrxTrhWYEbA"
                 />
+                {/* For every job in the database, if the longitude and latitude is not null, create a marker component that display the job in the map container */}
                 {jobs.map((job, index) => (
                     job.latitude !== null && job.longitude !== null ? (
                         <Marker key={index} position={[job.latitude, job.longitude]}>

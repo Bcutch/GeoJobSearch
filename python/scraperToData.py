@@ -193,8 +193,6 @@ class scraperToDataConnection:
                     None,  # Placeholder for salary, will be calculated below
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0,
-                    "43.5448", # set guelph as default longitude and latitude
-                    "80.2482",
                 ]
                 
                 if len(job["url"]) > 2083: 
@@ -206,10 +204,12 @@ class scraperToDataConnection:
                     if len(salaries) > 0:
                         salary = round(sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
                         values[5] = salary  # Set calculated salary
+                
+                # Use the Geopy library to get the longitude and latitude as long as a job has a location
                 if job['location'] != None:
                     loc = Nominatim(user_agent="Geopy Library")
                     getLoc = loc.geocode(job['location'])
-                    if getLoc != None:
+                    if getLoc != None: # Only set longitude and Latitude if a valid value is found for given location
                         values[8] = getLoc.longitude
                         values[9] = getLoc.latitude
                         print(f"Location: {job['location']}, Longitude: {values[8]}, Latitude: {values[9]}")
