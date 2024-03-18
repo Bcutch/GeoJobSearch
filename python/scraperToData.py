@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
 import re
+from geopy.geocoders import Nominatim
     
 # can be tested by running:
 # pytest python/test_scraperToData.py
@@ -181,8 +182,8 @@ class scraperToDataConnection:
         for job in jobData:
             try:
                 query = """INSERT INTO job
-                           (title, company, location, description, url, salary, field, is_remote)
-                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"""
+                           (title, company, location, description, url, salary, field, is_remote, longitude, latitude)
+                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
                 values = [
                     job['title'],           # was job.get('title', None)        changed so that an error is thrown if no title is found
                     job.get('company', None),
@@ -191,7 +192,9 @@ class scraperToDataConnection:
                     job['url'],             # was job.get('url', None)        changed so that an error is thrown if no title is found
                     None,  # Placeholder for salary, will be calculated below
                     job.get('field', None),
-                    int(job['remote']) if 'remote' in job else 0
+                    int(job['remote']) if 'remote' in job else 0,
+                    None,
+                    None
                 ]
                 
                 if len(job["url"]) > 2083: 
@@ -203,7 +206,18 @@ class scraperToDataConnection:
                     if len(salaries) > 0:
                         salary = round(sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
                         values[5] = salary  # Set calculated salary
-            
+                
+                # Use the Geopy library to get the longitude and latitude as long as a job has a location
+                if 'location' in job and job['location'] is not None:
+                    loc = Nominatim(user_agent="Geopy Library")
+                    getLoc = loc.geocode(job['location'])
+                    if getLoc != None: # Only set longitude and Latitude if a valid value is found for given location
+                        if len(values) < 10:  # Ensure that values has enough elements
+                            values.extend([None] * (9 - len(values) + 1))
+                        values[8] = getLoc.longitude
+                        values[9] = getLoc.latitude
+                        print(f"Location: {job['location']}, Longitude: {values[8]}, Latitude: {values[9]}")
+
                 self.cursor.execute(query, tuple(values))
                 self.databaseConnection.commit()
             except mysql.connector.IntegrityError as error:

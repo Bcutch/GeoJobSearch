@@ -95,7 +95,7 @@ def scrapeIndeed(numPages:int, jobData:list, jobLimit:int = -1, serverHostname:s
                 title = header.find('span').text # Code to get job title for given url
             
             # location
-            location = jobSoup.find('div', class_='css-1ikmi61 eu4oa1w0')
+            location = jobSoup.find('div', {'data-testid': 'inlineHeader-companyLocation'})
             if location is not None: 
                 location = location.text
             

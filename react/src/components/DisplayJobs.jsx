@@ -38,7 +38,7 @@ const DisplayJobs = () => {
               <p><strong>Salary:</strong> {selectedJob.salary}</p>
               <p><strong>Job Description: </strong>{selectedJob.description}</p>
               <div className="flex items-end w-full h-full justify-center">
-                <button className="btn btn-primary align-bottom"><a href={selectedJob.url} target="_blank" className="text-white">Apply Here</a></  button>
+                <button className="btn btn-primary align-bottom"><a href={selectedJob.url} target="_blank" rel="noreferrer" className="text-white">Apply Here</a></  button>
               </div>
           </div>
         ) : (
