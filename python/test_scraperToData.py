@@ -114,8 +114,7 @@ def testTableCreated(mockDatabase, databaseName,result,expected):
 def testAddCorruptData(mockDatabase):
     badData = [{'THIS':'IS A TEST'}]
     
-    with pytest.raises(KeyError):
-        mockDatabase.addJobData(badData)
+    mockDatabase.addJobData(badData) == 0
 
 
 def testAddMultipleData(mockDatabase):
@@ -149,7 +148,7 @@ def testAddMultipleData(mockDatabase):
         ["mydatabase","a url"], 
         25, 
         None]
-    return_values = [None, 1, None, 1, None, None, None, None, None]
+    return_values = [[0], [1], [0], [1], [0], [0], [0], [0], [0]]
     mockDatabase.cursor.fetchone.side_effect = return_values
 
     assert mockDatabase.addJobData(data) == 2     # we will add this same data multiple times to check for duplicates
@@ -161,6 +160,11 @@ def testLongUrlLength(mockDatabase):
         'title':fakeDataTitle,
         'url':string
         }]
+    mockDatabase.cursor.configure_mock(
+        **{
+            "fetchone.return_value": [0]
+        }
+    )
     
     mockDatabase.addJobData(data) == 0                 # should not be able to add a value longer than the allowed length
 
@@ -179,8 +183,7 @@ def testNoURL(mockDatabase): # url value MUST exist, if not an error should be r
         'title':fakeDataTitle
         }]
     
-    with pytest.raises(KeyError):
-        mockDatabase.addJobData(data)
+    mockDatabase.addJobData(data) == 0
     
     
     
@@ -204,7 +207,7 @@ def testAddCorrectRemoteValue(mockDatabase):
         }]
     mockDatabase.cursor.configure_mock(
         **{
-            "fetchone.return_value": None
+            "fetchone.return_value": [0]
         }
     )
     assert mockDatabase.addJobData(remoteData) == 1
@@ -221,7 +224,7 @@ def testHandleExtraData(mockDatabase):
         }]
     mockDatabase.cursor.configure_mock(
         **{
-            "fetchone.return_value": None
+            "fetchone.return_value": [0]
         }
     )
     assert mockDatabase.addJobData(extraData) == 1            # should raise no errors
@@ -236,7 +239,7 @@ def testAddCorrectSalary(mockDatabase):
         }]
     mockDatabase.cursor.configure_mock(
         **{
-            "fetchone.return_value": None
+            "fetchone.return_value": [0]
         }
     )
     assert mockDatabase.addJobData(data) == 1           # should raise no errors
@@ -251,15 +254,15 @@ def testAddNumericSalary(mockDatabase):
         }]
     mockDatabase.cursor.configure_mock(
         **{
-            "fetchone.return_value": None
+            "fetchone.return_value": [0]
         }
     )
     assert mockDatabase.addJobData(data) == 1            # should raise no errors
 
 
 @pytest.mark.parametrize("jobEntry, expected, result", 
-    [({   # this is fake data that will be inserted into the table and also removed
-        'title':fakeDataTitle,
+                         # this is fake data that will be inserted into the table and also removed
+    [({'title':'THIS_IS_A_UNIT_TEST_TITLE',
         'url':'THIS_IS_CORRECT_FAKE_DATA',
         'company': 'Shark Hunters',
         'location': "Atlantis",
@@ -269,11 +272,13 @@ def testAddNumericSalary(mockDatabase):
         'salary': "$200,000 - $300,000 per year",
         'seniority': "High-level",
         'description': "The \tcraziest job you'll ever see!!\n\n."
-        }, False, None),
-    ({'url':'THIS_IS_CORRECT_FAKE_DATA',
-        'company': 'Shark Hunters'}, True, 1),
-    ({'url':'THIS_IS_MORE_FAKE_DATA',
-        'company': 'Shark Hunters'}, True, 6),
+        }, False, [0]),
+    ({'title':'THIS_IS_A_UNIT_TEST_TITLE',
+        'url':'THIS_IS_CORRECT_FAKE_DATA',
+        'company': 'Shark Hunters'}, True, [1]),
+    ({'title':'THIS_IS_A_UNIT_TEST_TITLE',
+        'url':'THIS_IS_MORE_FAKE_DATA',
+        'company': 'Shark Hunters'}, True, [6]),
     ({'title':fakeDataTitle,
         'url':None,
         'company': 'Shark Hunters'}, False, None), 
