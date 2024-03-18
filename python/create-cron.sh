@@ -1,9 +1,9 @@
+python main.py
 
-chmod +x /python/main.py
-
-mv /python/run-scraper /etc/cron.d/run-scraper
-chmod 0644 /etc/cron.d/run-scraper
-crontab /etc/cron.d/run-scraper
+mv /python/run-scraper /etc/cron.d/main-cron
+chmod 0644 /etc/cron.d/main-cron
+crontab /etc/cron.d/main-cron
+touch /var/log/cron.log
 
 printenv >> /etc/environment
 
