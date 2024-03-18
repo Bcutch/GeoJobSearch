@@ -210,7 +210,9 @@ class scraperToDataConnection:
                     loc = Nominatim(user_agent="Geopy Library")
                     getLoc = loc.geocode(job['location'])
                     if getLoc != None: # Only set longitude and Latitude if a valid value is found for given location
-                        values[8] = getLoc.longitude
+                        if len(values) < 9:  # Ensure that values has enough elements
+                            values.extend([None] * (9 - len(values) + 1))
+                        values[8] = getLoc.longitud
                         values[9] = getLoc.latitude
                         print(f"Location: {job['location']}, Longitude: {values[8]}, Latitude: {values[9]}")
 
