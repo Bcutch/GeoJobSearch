@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 # This is the script that is called from the docker file and will run every time
 # docker compose is called

@@ -7,7 +7,9 @@ COPY requirements.txt .
 # Install any dependencies specified in requirements.txt
 RUN pip install -r requirements.txt
 
+RUN apt-get update && apt-get install -y cron
+
 COPY . .
 
-CMD python main.py
+CMD ["bash", "create-cron.sh"]
 
