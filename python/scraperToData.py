@@ -193,6 +193,8 @@ class scraperToDataConnection:
                     None,  # Placeholder for salary, will be calculated below
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0,
+                    None,
+                    None
                 ]
                 
                 if len(job["url"]) > 2083: 
