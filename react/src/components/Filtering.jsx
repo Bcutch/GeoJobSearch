@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
-const Filtering = () => {
+const Filtering = (prop) => {
   // State for the titles of the dropdown buttons
   const [jobType, setJobType] = useState("Job Type");
   const [remote, setRemote] = useState("Remoteness");
@@ -23,7 +23,7 @@ const Filtering = () => {
 
     fetch("http://localhost:8080/jobs", requestOptions)
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => {prop.setJobs(data)})
       .catch((error) => console.error("Error filtering jobs:", error));
   }, [jobType, remote, salary, distance]);
 
