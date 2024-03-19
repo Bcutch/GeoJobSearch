@@ -23,5 +23,4 @@ connection = scraperToData.scraperToDataConnection(host="mysql", user="root", pa
 print("connected to db")
 
 # add jobs to table
-numJobsAdded = connection.addJobData(jobDict)
-print(f"Added {numJobsAdded}/{len(jobDict)} jobs")
+connection.addJobData(jobDict)
