@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 # This is the script that is called from the docker file and will run every time
 # docker compose is called
@@ -22,4 +23,5 @@ connection = scraperToData.scraperToDataConnection(host="mysql", user="root", pa
 print("connected to db")
 
 # add jobs to table
-connection.addJobData(jobDict)
+numJobsAdded = connection.addJobData(jobDict)
+print(f"Added {numJobsAdded}/{len(jobDict)} jobs")

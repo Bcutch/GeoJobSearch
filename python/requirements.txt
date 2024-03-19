@@ -6,3 +6,4 @@ pytest-cov
 requests
 pylint
 mock
+geopy
