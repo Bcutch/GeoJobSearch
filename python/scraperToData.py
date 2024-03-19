@@ -186,15 +186,15 @@ class scraperToDataConnection:
                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
                 values = [
                     job['title'],           # was job.get('title', None)        changed so that an error is thrown if no title is found
-                    job.get('company', "Couldn't find company name check website"),
-                    job.get('location') if job.get('location') is not None else "Please check company website for location",
-                    job.get('description', "Please check company website for details"),
+                    job.get('company', None),
+                    job.get('location', None),
+                    job.get('description', None),
                     job['url'],             # was job.get('url', None)        changed so that an error is thrown if no title is found
-                    0,  # Placeholder for salary, will be calculated below
+                    None,  # Placeholder for salary, will be calculated below
                     job.get('field', None),
                     int(job['remote']) if 'remote' in job else 0,
-                    -80.2482,
-                    43.5448,
+                    None,
+                    None
                 ]
                 
                 if len(job["url"]) > 2083: 
