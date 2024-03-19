@@ -8,7 +8,7 @@ Table Creation:
 For test table, enter the container and search for the tables in there and verify the results match the expected result.
 * Test Commands: docker compose up
 * docker exec -it springtemplate-mysql-1 /bin/bash 
-* mariadb -u root -p pwd
+* mariadb -u root -ppwd
 * use template_db
 * show tables
    * Expected Results:
