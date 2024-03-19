@@ -45,7 +45,7 @@ const Filtering = (prop) => {
   };
 
   return (
-    <div className="flex gap-2 justify-center p-4">
+    <div className="flex gap-2 justify-center p-4 bg-gray-100">
       <DropdownButton title={jobType} onSelect={handleJobTypeSelect}>
         <Dropdown.Item eventKey="Full-time">Full-time</Dropdown.Item>
         <Dropdown.Item eventKey="Part-time">Part-time</Dropdown.Item>
