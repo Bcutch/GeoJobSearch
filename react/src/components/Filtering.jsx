@@ -1,13 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
-const Filtering = () => {
+const Filtering = (prop) => {
   // State for the titles of the dropdown buttons
   const [jobType, setJobType] = useState("Job Type");
-  const [remote, setRemote] = useState("Remote");
+  const [remote, setRemote] = useState("Remoteness");
   const [salary, setSalary] = useState("Salary");
   const [distance, setDistance] = useState("Distance");
+
+  useEffect(() => {
+
+    var cat = Object.assign({}, {jobType}, {remote}, {salary}, {distance});
+    //var catstr = "'"+JSON.stringify( cat )+"'";
+    //console.log(catstr);
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify( cat )
+    };
+
+    fetch("http://localhost:8080/jobs", requestOptions)
+      .then((response) => response.json())
+      .then((data) => {prop.setJobs(data)})
+      .catch((error) => console.error("Error filtering jobs:", error));
+  }, [jobType, remote, salary, distance]);
 
   // Handler functions to update state based on the selected item's eventKey
   const handleJobTypeSelect = (eventKey) => {
@@ -21,7 +39,7 @@ const Filtering = () => {
   const handleSalarySelect = (eventKey) => {
     setSalary(eventKey);
   };
-
+  
   const handleDistanceSelect = (eventKey) => {
     setDistance(eventKey);
   };

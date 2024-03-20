@@ -19,7 +19,7 @@ public class BackendApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/jobs").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/jobs").allowedOrigins("http://localhost:3000").allowedMethods("*");
 			}
 		};
 	}
