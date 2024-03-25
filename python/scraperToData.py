@@ -173,6 +173,117 @@ class scraperToDataConnection:
             longitude DECIMAL(11,8)
         );""")
         
+        
+    def __validateJobEntry(self, jobEntry:dict) -> bool:
+        """ Attempts to validate if a job entry is valid to entry the database
+
+        Args:
+            jobEntry (dict): dictionary of a job entry
+
+        Returns:
+            int: true or false if job is valid or not
+        """
+        try:
+            if self.jobExists(jobEntry) is True:
+                # if job url already exists in database, skip job
+                print("WARNING: Duplicate Entry Attempted")
+                return False
+            
+            if len(jobEntry["url"]) > 2083: 
+                print("WARNING: Caught URL Longer than allowed 2083 chars")
+                
+        except BaseException as error:
+            print("WARNING in validating job entry:", error)
+            return False
+    
+    def __parseSalary(self, salary:str) -> int:
+        """ Parses salary field from string to int
+
+        Args:
+            salary (str): salary field as a string
+
+        Returns:
+            int: parsed salary
+        """
+        if salary is None:
+            return None
+        try:
+            # Calculate and set salary
+            salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', salary)
+            if len(salaries) > 0:
+                averageSalary = sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries)
+                return round(averageSalary, 2)
+                
+        except BaseException as error:
+            print("WARNING in parsing salary:", error)
+        
+        finally:
+            return None
+        
+        
+    def __calculateCoordinates(self, location:str, values:list) -> list:
+        """ calculates long/lat coordinates from location
+
+        Args:
+            location (str): location field as a string
+
+        Returns:
+            list: [longitude, latitude]
+        """
+        if location is None:
+            return [None, None]
+        try:
+            loc = Nominatim(user_agent="Geopy Library")
+            getLoc = loc.geocode(location)
+            if getLoc is not None: # Only set longitude and Latitude if a valid value is found for given location
+                if len(values) < 10:  # Ensure that values has enough elements
+                    values.extend([None] * (9 - len(values) + 1))
+                longitude = getLoc.longitude
+                latitude = getLoc.latitude
+                print(f"Location: {location}, Longitude: {longitude}, Latitude: {latitude}")
+                
+                return [longitude, latitude]
+                
+        except BaseException as error:
+            print("WARNING in calculating long/lat:", error)
+        finally:
+            return [None, None]
+        
+    def __addSingleJob(self, job:dict) -> bool:
+        if self.__validateJobEntry(job) is False:
+            # job was not valid
+            return False
+        
+        try:
+            query = """INSERT INTO job
+                        (title, company, location, description, url, salary, field, is_remote, longitude, latitude)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+            values = [
+                job['title'],           # was job.get('title', None)        changed so that an error is thrown if no title is found
+                job.get('company', None),
+                job.get('location', None),
+                job.get('description', None),
+                job['url'],             # was job.get('url', None)        changed so that an error is thrown if no title is found
+                None,  # Placeholder for salary, will be calculated below
+                job.get('field', None),
+                int(job['remote']) if 'remote' in job else 0,
+                None,
+                None
+            ]
+            # Calculate and set salary
+            values[5] = self.__parseSalary(salary=job.get('salary'))
+            # Use the Geopy library to get the longitude and latitude as long as a job has a location
+            values[8], values[9] = self.__calculateCoordinates(location=job.get('location'), values=values)
+
+            # update to database
+            self.cursor.execute(query, tuple(values))
+            self.databaseConnection.commit()
+            
+            return True
+            
+        except BaseException as error:
+            print("WARNING:", error)
+            return False
     
     def addJobData(self, jobData:list) -> int:
         """Adds data from a list in the format: [{dict}, {dict}, {dict}...]. 
@@ -181,83 +292,17 @@ class scraperToDataConnection:
         Returns:
             int: Returns number of jobs added. This can be used to determine the percent of jobs that were successfully added.
         """
+        if type(jobData) not in (dict, list):
+            return 0
+        
         if isinstance(jobData, dict):
             jobData = [jobData]
         
         totalJobsAdded = 0
 
-        for job in jobData:
-            if self.jobExists(jobEntry=job) is True:
-                # if job url already exists in database, skip job
-                print("WARNING: Duplicate Entry Attempted")
-                continue
-            
-            try:
-                query = """INSERT INTO job
-                           (title, company, location, description, url, salary, field, is_remote, longitude, latitude)
-                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
-                values = [
-                    job['title'],           # was job.get('title', None)        changed so that an error is thrown if no title is found
-                    job.get('company', "Couldn't find company name check website"),
-                    job.get('location') if job.get('location') is not None else "Please check company website for location",
-                    job.get('description', "Please check company website for details"),
-                    job['url'],             # was job.get('url', None)        changed so that an error is thrown if no title is found
-                    0,  # Placeholder for salary, will be calculated below
-                    job.get('field', None),
-                    int(job['remote']) if 'remote' in job else 0,
-                    -80.2482,
-                    43.5448,
-                ]
-                
-                if len(job["url"]) > 2083: 
-                    raise mysql.connector.errors.DataError("Url Caught is Longer than allowed 2083 chars")
-            
-                # Calculate and set salary
-                if 'salary' in job and isinstance(job['salary'], str):
-                    salaries = re.findall(r'[\$\£\€][,\d]+\.?\d*', job['salary'])
-                    if len(salaries) > 0:
-                        salary = round(sum(float(val[1:].replace(",", "")) for val in salaries) / len(salaries), 2)
-                        values[5] = salary  # Set calculated salary
-                
-                # Use the Geopy library to get the longitude and latitude as long as a job has a location
-                if 'location' in job and job['location'] is not None:
-                    loc = Nominatim(user_agent="Geopy Library")
-                    getLoc = loc.geocode(job['location'])
-                    if getLoc is not None: # Only set longitude and Latitude if a valid value is found for given location
-                        if len(values) < 10:  # Ensure that values has enough elements
-                            values.extend([None] * (9 - len(values) + 1))
-                        values[8] = getLoc.longitude
-                        values[9] = getLoc.latitude
-                        print(f"Location: {job['location']}, Longitude: {values[8]}, Latitude: {values[9]}")
-
-                self.cursor.execute(query, tuple(values))
-                self.databaseConnection.commit()
-                
-                totalJobsAdded += 1 # counts number of jobs added
-                
-            except mysql.connector.IntegrityError as error:
-                if self.debugFeedback: 
-                    print(error)
-                if str(error)[:4] != "1062":
-                    raise
-                
-            except mysql.connector.errors.DataError as error:
-                print(f"WARNING in {__name__} in addJobData:", error)
-                continue
-                
-            except ValueError as error:
-                print(f"WARNING in {__name__} in addJobData:", error)
-                continue
-                
-            except TypeError as error:
-                print(f"WARNING in {__name__} in addJobData:", error)
-                continue
-            
-            except KeyError as error:
-                # there was probably no title or url in a given job entry
-                print(f"WARNING in {__name__} in addJobData:", error)
-                continue
-            
+        for jobEntry in jobData:
+            if self.__addSingleJob(job=jobEntry) is True:
+                totalJobsAdded += 1
             
         return totalJobsAdded
 
