@@ -54,6 +54,6 @@ python_analysis:
     - cd python
     - pip install -r requirements.txt
     - export PYTHONPATH=./
-    - pylint ./ || true
+    - pylint ./
     #    - pytest test_scrapingBot.py --cov
     - pytest test_scraperToData.py --cov
