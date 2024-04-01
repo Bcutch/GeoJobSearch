@@ -5,7 +5,7 @@ export default function Map() {
     const [jobs, setJobs] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/jobs")
+        fetch("/api/jobs")
         .then((response) => response.json())
         .then((data) => setJobs(data))
         .catch((error) => console.error("Error fetching jobs:", error));

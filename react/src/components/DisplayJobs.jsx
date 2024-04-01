@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 const DisplayJobs = (prop) => {
 
   useEffect(() => {
-    fetch("http://localhost:8080/jobs")
+    fetch("/api/jobs")
       .then((response) => response.json())
       .then((data) => {prop.setJobs(data)})
       .catch((error) => console.error("Error fetching jobs:", error));

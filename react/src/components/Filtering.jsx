@@ -21,7 +21,7 @@ const Filtering = (prop) => {
       body: JSON.stringify( cat )
     };
 
-    fetch("http://localhost:8080/jobs", requestOptions)
+    fetch("/api/jobs", requestOptions)
       .then((response) => response.json())
       .then((data) => {prop.setJobs(data)})
       .catch((error) => console.error("Error filtering jobs:", error));
