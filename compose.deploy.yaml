@@ -1,0 +1,89 @@
+# List of Services
+services:
+  swag: #reverse proxy
+      image: lscr.io/linuxserver/swag:latest
+      container_name: swag
+      cap_add:
+        - NET_ADMIN
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - URL=zenith.socs.uoguelph.ca
+        - VALIDATION=http
+        - STAGING=false #optional
+      volumes:
+        - ./swag/config:/config
+      ports:
+        - 443:443
+        - 80:80 #optional
+      depends_on:
+        - react
+      networks:
+        - swag-react
+      restart: unless-stopped
+
+  spring:
+    build: ./spring # Look for Dockerfile in this path
+    tty: true
+    environment:
+      # These are used in apllication.property to setup DB connection
+      - DB_ADDRESS=jdbc:mysql://mysql:3306
+      - DB_DATABASE=template_db
+      - DB_USER=root
+      - DB_PASSWORD=pwd
+    networks:
+      - spring-mysql # Allow the spring app to discover the mysql app
+      - spring-react
+      - spring-python # Allow the spring app to talk to the react app
+
+  mysql:
+    build: ./mysql # Look for Dockerfile in this path
+    environment:
+      # Mysql docker image env vars
+      - MYSQL_ROOT_PASSWORD=pwd
+      - MYSQL_DATABASE=template_db
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - spring-mysql # Allow the mysql app to talk to the spring app
+
+  python:
+    build: ./python
+    environment:  # Environment variables for the Python service
+      - DB_HOST=mysql  # Hostname for the MySQL database, 'mysql' is the service name in docker-compose
+      - DB_DATABASE=template_db  # The name of the database to use
+      - DB_USER=root  # The username for the database
+      - DB_PASSWORD=pwd  # The password for the database
+
+    networks:
+      - spring-python
+      - spring-mysql
+
+  react:
+    build: ./react # Look for Dockerfile in this path
+    tty: true
+    environment:
+      # Tell the react app that our spring server is running here
+      - BACKEND_PROXY=http://spring:8080
+    networks:
+      - spring-react # Allow the react app to discover the spring app
+      - swag-react
+
+  selenium:
+    image: seleniarm/standalone-chromium
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    networks:
+      - spring-python
+
+volumes:
+  mariadb_data:
+
+# List of Networks
+networks:
+  spring-mysql:
+  spring-react:
+  spring-python:
+  swag-react:
