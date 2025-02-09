@@ -13,7 +13,7 @@ RUN npm ci
 # installed tailwindcss as a dependency
 RUN npm install tailwindcss 
 RUN npm install leaflet
-RUN npm install react-leaflet@4.2.1
+RUN npm install react-leaflet
 RUN npm install react-dom
 # Set environment variables
 ENV CI=true

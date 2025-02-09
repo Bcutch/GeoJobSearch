@@ -9,7 +9,7 @@ services:
         - PUID=1000
         - PGID=1000
         - TZ=Etc/UTC
-        - URL=${ZENITH_URL}
+        - URL=zenith.socs.uoguelph.ca
         - VALIDATION=http
         - STAGING=false #optional
       volumes:
@@ -28,10 +28,10 @@ services:
     tty: true
     environment:
       # These are used in apllication.property to setup DB connection
-      - DB_ADDRESS=jdbc:mysql://mysql:${SQL_PORT}
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ADDRESS=jdbc:mysql://mysql:3306
+      - DB_DATABASE=template_db
+      - DB_USER=root
+      - DB_PASSWORD=pwd
     networks:
       - spring-mysql # Allow the spring app to discover the mysql app
       - spring-react
@@ -51,10 +51,10 @@ services:
   python:
     build: ./python
     environment:  # Environment variables for the Python service
-      - DB_HOST=${DB_HOST}  # Hostname for the MySQL database, 'mysql' is the service name in docker-compose
-      - DB_DATABASE=${DB_DATABASE}  # The name of the database to use
-      - DB_USER=${DB_USER}  # The username for the database
-      - DB_PASSWORD=${DB_PASSWORD}  # The password for the database
+      - DB_HOST=mysql  # Hostname for the MySQL database, 'mysql' is the service name in docker-compose
+      - DB_DATABASE=template_db  # The name of the database to use
+      - DB_USER=root  # The username for the database
+      - DB_PASSWORD=pwd  # The password for the database
 
     networks:
       - spring-python
